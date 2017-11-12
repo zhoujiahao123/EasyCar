@@ -5,5 +5,7 @@ package com.jacob.www.easycar.base;
  */
 
 public interface BaseView<T> {
-    void setPresenter(T presenter);
+   void showProgress();
+   void hideProgress();
+   void showMsg(String msg);
 }

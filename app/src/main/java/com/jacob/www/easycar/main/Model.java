@@ -1,13 +1,11 @@
 package com.jacob.www.easycar.main;
 
+import com.jacob.www.easycar.net.LoadingCallBack;
+
 /**
  * Created by ASUS-NB on 2017/11/12.
  */
 
 public interface Model  {
-    interface LoadingCallBack{
-        void onLoaded();//数据加载成功
-    }
-
     void getData(LoadingCallBack callBack);
 }

@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    buildToolsVersion "26.0.2"
     defaultConfig {
         applicationId "com.jacob.www.easycar"
         minSdkVersion 14
@@ -25,7 +25,7 @@ android {
 }
 repositories {
     flatDir {
-        dirs 'libs' //¾ÍÊÇÄã·ÅaarµÄÄ¿Â¼µØÖ·
+        dirs 'libs' //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½aarï¿½ï¿½Ä¿Â¼ï¿½ï¿½Ö·
     }
 }
 

@@ -9,7 +9,7 @@ import com.jacob.www.easycar.base.BaseView;
 
 public interface MainContract {
     interface View  extends BaseView<Presenter>{
-        void showMsg();
+   
     }
     interface Presenter extends BasePresenter{
         //需要presenter做的操作

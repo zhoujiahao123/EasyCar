@@ -1,27 +1,26 @@
 package com.jacob.www.easycar.main;
 
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-
 import com.jacob.www.easycar.R;
+import com.jacob.www.easycar.base.BaseActivity;
 
-public class MainActivity extends AppCompatActivity implements MainContract.View{
+public class MainActivity extends BaseActivity implements MainContract.View{
 
     MainContract.Presenter presenter;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    public int getLayoutId() {
+        return R.layout.activity_main;
+    }
+
+    @Override
+    public void init() {
         presenter = new MainPresenter(this);
     }
+    
+
 
     @Override
-    public void setPresenter(MainContract.Presenter presenter) {
-
-    }
-
-    @Override
-    public void showMsg() {
+    public void showMsg(String msg) {
 
     }
 
@@ -29,5 +28,15 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     protected void onResume() {
         super.onResume();
         presenter.start();
+    }
+
+    @Override
+    public void showProgress() {
+        
+    }
+
+    @Override
+    public void hideProgress() {
+
     }
 }
