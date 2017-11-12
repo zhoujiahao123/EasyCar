@@ -20,7 +20,7 @@ public class BaseModelImpl {
 
     public BaseModelImpl() {
         mRetrofit = new Retrofit.Builder()
-//                .baseUrl()
+                .baseUrl(ResponseCons.BASE_URL)
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())

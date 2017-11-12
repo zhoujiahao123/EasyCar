@@ -6,6 +6,7 @@ package com.zxr.medicalaid;
  */
 public class User {
 
+    private String uId;
     private Long id;
     private String userName;
     private String phoneNum;
@@ -18,11 +19,20 @@ public class User {
         this.id = id;
     }
 
-    public User(Long id, String userName, String phoneNum, String icon) {
+    public User(String uId, Long id, String userName, String phoneNum, String icon) {
+        this.uId = uId;
         this.id = id;
         this.userName = userName;
         this.phoneNum = phoneNum;
         this.icon = icon;
+    }
+
+    public String getUId() {
+        return uId;
+    }
+
+    public void setUId(String uId) {
+        this.uId = uId;
     }
 
     public Long getId() {

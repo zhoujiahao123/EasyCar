@@ -5,5 +5,5 @@ package com.jacob.www.easycar.net;
  */
 
 public class ResponseCons {
-
+        public static final  String BASE_URL = "http://120.77.87.78:9999/easycar/";
 }

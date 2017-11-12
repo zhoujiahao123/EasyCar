@@ -23,10 +23,11 @@ public class UserDao extends AbstractDao<User, Long> {
      * Can be used for QueryBuilder and for referencing column names.
     */
     public static class Properties {
-        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
-        public final static Property UserName = new Property(1, String.class, "userName", false, "USER_NAME");
-        public final static Property PhoneNum = new Property(2, String.class, "phoneNum", false, "PHONE_NUM");
-        public final static Property Icon = new Property(3, String.class, "icon", false, "ICON");
+        public final static Property UId = new Property(0, String.class, "uId", false, "U_ID");
+        public final static Property Id = new Property(1, Long.class, "id", true, "_id");
+        public final static Property UserName = new Property(2, String.class, "userName", false, "USER_NAME");
+        public final static Property PhoneNum = new Property(3, String.class, "phoneNum", false, "PHONE_NUM");
+        public final static Property Icon = new Property(4, String.class, "icon", false, "ICON");
     };
 
 
@@ -42,10 +43,11 @@ public class UserDao extends AbstractDao<User, Long> {
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "'USER' (" + //
-                "'_id' INTEGER PRIMARY KEY ," + // 0: id
-                "'USER_NAME' TEXT," + // 1: userName
-                "'PHONE_NUM' TEXT," + // 2: phoneNum
-                "'ICON' TEXT);"); // 3: icon
+                "'U_ID' TEXT," + // 0: uId
+                "'_id' INTEGER PRIMARY KEY ," + // 1: id
+                "'USER_NAME' TEXT," + // 2: userName
+                "'PHONE_NUM' TEXT," + // 3: phoneNum
+                "'ICON' TEXT);"); // 4: icon
     }
 
     /** Drops the underlying database table. */
@@ -59,41 +61,47 @@ public class UserDao extends AbstractDao<User, Long> {
     protected void bindValues(SQLiteStatement stmt, User entity) {
         stmt.clearBindings();
  
+        String uId = entity.getUId();
+        if (uId != null) {
+            stmt.bindString(1, uId);
+        }
+ 
         Long id = entity.getId();
         if (id != null) {
-            stmt.bindLong(1, id);
+            stmt.bindLong(2, id);
         }
  
         String userName = entity.getUserName();
         if (userName != null) {
-            stmt.bindString(2, userName);
+            stmt.bindString(3, userName);
         }
  
         String phoneNum = entity.getPhoneNum();
         if (phoneNum != null) {
-            stmt.bindString(3, phoneNum);
+            stmt.bindString(4, phoneNum);
         }
  
         String icon = entity.getIcon();
         if (icon != null) {
-            stmt.bindString(4, icon);
+            stmt.bindString(5, icon);
         }
     }
 
     /** @inheritdoc */
     @Override
     public Long readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
+        return cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1);
     }    
 
     /** @inheritdoc */
     @Override
     public User readEntity(Cursor cursor, int offset) {
         User entity = new User( //
-            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // userName
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // phoneNum
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3) // icon
+            cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // uId
+            cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // id
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // userName
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // phoneNum
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) // icon
         );
         return entity;
     }
@@ -101,10 +109,11 @@ public class UserDao extends AbstractDao<User, Long> {
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, User entity, int offset) {
-        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setUserName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setPhoneNum(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setIcon(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setUId(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
+        entity.setId(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
+        entity.setUserName(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setPhoneNum(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setIcon(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
      }
     
     /** @inheritdoc */

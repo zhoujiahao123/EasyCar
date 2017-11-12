@@ -5,5 +5,5 @@ package com.jacob.www.easycar.base;
  */
 
 public interface BasePresenter {
-    void start();
+    void start(String ...args);
 }

@@ -12,6 +12,7 @@ public class Database {
     }
     public static void addUser(Schema schema){
         Entity user = schema.addEntity("User");
+        user.addStringProperty("uId");
         user.addIdProperty().primaryKey();
         user.addStringProperty("userName");
         user.addStringProperty("phoneNum");

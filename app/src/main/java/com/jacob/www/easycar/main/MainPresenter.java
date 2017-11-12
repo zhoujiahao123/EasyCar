@@ -11,10 +11,7 @@ public class MainPresenter implements MainContract.Presenter {
         view.setPresenter(this);
         this.view = view;
     }
-    @Override
-    public void start() {
-        loadSome();
-    }
+
 
     @Override
     public void loadSome() {
@@ -24,5 +21,10 @@ public class MainPresenter implements MainContract.Presenter {
                 view.showMsg();
             }
         });
+    }
+
+    @Override
+    public void start(String... args) {
+
     }
 }
