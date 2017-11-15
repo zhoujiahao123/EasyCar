@@ -1,17 +1,15 @@
 package com.jacob.www.easycar.main;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.Toast;
+import android.view.View;
 
+import com.amap.api.maps.AMap;
+import com.amap.api.maps.CameraUpdateFactory;
+import com.amap.api.maps.MapView;
+import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.AMapNaviListener;
 import com.amap.api.navi.AMapNaviView;
@@ -36,88 +34,89 @@ import com.jacob.www.easycar.base.App;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements MainContract.View, AMapNaviListener, AMapNaviViewListener {
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+public class MainActivity extends AppCompatActivity implements MainContract.View, AMapNaviListener, AMapNaviViewListener, AMap.OnMyLocationChangeListener {
     AMapNavi mAMapNavi;
     MainContract.Presenter presenter;
+    //起始点经纬度
     protected final List<NaviLatLng> sList = new ArrayList<NaviLatLng>();
+    //终点经纬度
     protected final List<NaviLatLng> eList = new ArrayList<NaviLatLng>();
+    //途中经过的点的经纬度，一般都没用上
     protected final List<NaviLatLng> mWayPointList = new ArrayList<NaviLatLng>();
     //获取 AMapNaviView 实例
     AMapNaviView mAMapNaviView;
-    private LocationManager locationManager;
+    //地图对象
+    MapView mMapView = null;
+    AMap aMap;
+    //定位的style
+    MyLocationStyle myLocationStyle;
+    //目前我所在位置的经纬度
+    double myLongitude = 0, myLatitude = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
         presenter = new MainPresenter(this);
+        initView(savedInstanceState);
+
+    }
+
+    private void initView(Bundle savedInstanceState) {
         mAMapNaviView = (AMapNaviView) findViewById(R.id.navi_view);
         mAMapNaviView.onCreate(savedInstanceState);
+
+        mMapView = (MapView) findViewById(R.id.map);
+        mMapView.onCreate(savedInstanceState);
+        if (aMap == null) {
+            aMap = mMapView.getMap();
+        }
+        myLocationStyle = new MyLocationStyle();
+        myLocationStyle.interval(1000);
+        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);
+        aMap.setMyLocationEnabled(true);
+        aMap.setMyLocationStyle(myLocationStyle);
+        aMap.setOnMyLocationChangeListener(this);
+        aMap.moveCamera(CameraUpdateFactory.zoomTo(16));
+
+    }
+
+    /**
+     * 开始导航,根据经纬度
+     */
+    public void startNavi(double latitude, double longitude) {
+        double myLatitude = this.myLatitude;
+        double myLongitude = this.myLongitude;
+        Log.e("TAG", "收到的经纬度" + latitude + " " + longitude);
+        Log.e("TAG", "我的经纬度:" + myLatitude + " " + myLongitude);
+        mAMapNaviView.setVisibility(View.VISIBLE);
+        mMapView.setVisibility(View.INVISIBLE);
+        //算路终点坐标
+        NaviLatLng mEndLatlng = new NaviLatLng(latitude, longitude);
+        //算路起点坐标
+        NaviLatLng mStartLatlng = new NaviLatLng(myLatitude, myLongitude);
+        sList.add(mStartLatlng);
+        eList.add(mEndLatlng);
+        mAMapNavi = AMapNavi.getInstance(App.getAppContext());
+        //添加监听回调，用于处理算路成功
+        mAMapNavi.addAMapNaviListener(this);
         mAMapNaviView.setAMapNaviViewListener(this);
-        getLocation();
+        AMapNaviViewOptions options = mAMapNaviView.getViewOptions();
+        options.setLayoutVisible(false);
+        mAMapNaviView.setViewOptions(options);
+        onInitNaviSuccess();
     }
 
-    private String locationProvider;
+    @Override
+    public void onMyLocationChange(Location location) {
+        myLatitude = location.getLatitude();
+        myLongitude = location.getLongitude();
 
-    public void getLocation() {
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        List<String> providers = locationManager.getProviders(true);
-        if (providers.contains(LocationManager.GPS_PROVIDER)) {
-            // 如果是GPS
-            locationProvider = LocationManager.GPS_PROVIDER;
-        } else if (providers.contains(LocationManager.NETWORK_PROVIDER)) {
-            // 如果是Network
-            locationProvider = LocationManager.NETWORK_PROVIDER;
-        } else {
-            Toast.makeText(this, "没有可用的位置提供器", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        // 获取Location
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        Location location = locationManager.getLastKnownLocation(locationProvider);
-        if (location != null) {
-            //算路终点坐标
-            NaviLatLng mEndLatlng = new NaviLatLng(29.533889,106.605882);
-            //算路起点坐标
-            NaviLatLng mStartLatlng = new NaviLatLng(location.getLatitude(),location.getLongitude());
-            sList.add(mStartLatlng);
-            eList.add(mEndLatlng);
-            mAMapNavi = AMapNavi.getInstance(App.getAppContext());
-            //添加监听回调，用于处理算路成功
-            mAMapNavi.addAMapNaviListener(this);
-            AMapNaviViewOptions options = mAMapNaviView.getViewOptions();
-            options.setLayoutVisible(false);
-            mAMapNaviView.setViewOptions(options);
-        }
-        // 监视地理位置变化
-        locationManager.requestLocationUpdates(locationProvider, 3000, 1,
-                locationListener);
     }
-    LocationListener locationListener = new LocationListener() {
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle arg2) {
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-        }
-
-        @Override
-        public void onLocationChanged(Location location) {
-        }
-    };
 
     @Override
     public void setPresenter(MainContract.Presenter presenter) {
@@ -131,24 +130,32 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     protected void onResume() {
+        Log.e("TAG","onResume");
         super.onResume();
         mAMapNaviView.onResume();
+        mMapView.onResume();
     }
 
     @Override
     protected void onPause() {
+        Log.e("TAG","onResume");
         super.onPause();
         mAMapNaviView.onPause();
+        mMapView.onPause();
     }
+
     protected void onDestroy() {
+        Log.e("TAG","onResume");
         super.onDestroy();
         mAMapNaviView.onDestroy();
         mAMapNavi.stopNavi();
         mAMapNavi.destroy();
+        mMapView.onDestroy();
     }
+
     @Override
     public void onInitNaviFailure() {
-
+        Log.e("TAG", "算路失败");
     }
 
     @Override
@@ -169,7 +176,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
          *      不走高速与高速优先不能同时为true
          *      高速优先与避免收费不能同时为true
          */
-        int strategy=0;
+        Log.e("TAG", "算路成功");
+        int strategy = 0;
         try {
             strategy = mAMapNavi.strategyConvert(true, false, false, false, false);
         } catch (Exception e) {
@@ -278,8 +286,10 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     }
 
+    //算路成功后执行的
     @Override
     public void onCalculateRouteSuccess(int[] ints) {
+        Log.e("TAG", "开始导航");
         mAMapNavi.startNavi(NaviType.GPS);
     }
 
@@ -361,5 +371,11 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     @Override
     public void onNaviViewLoaded() {
 
+    }
+
+
+    @OnClick(R.id.btn)
+    public void onClick() {
+        startNavi(29.568711,106.550721);
     }
 }
