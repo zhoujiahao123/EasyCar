@@ -116,17 +116,10 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         myLatitude = location.getLatitude();
         myLongitude = location.getLongitude();
 
-    }
-
-    @Override
-    public void setPresenter(MainContract.Presenter presenter) {
 
     }
 
-    @Override
-    public void showMsg() {
 
-    }
 
     @Override
     protected void onResume() {
@@ -372,10 +365,23 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     public void onNaviViewLoaded() {
 
     }
-
-
     @OnClick(R.id.btn)
     public void onClick() {
-        startNavi(29.568711,106.550721);
+        startNavi(29.568711, 106.550721);
+    }
+    @Override
+    public void showProgress() {
+        
+    }
+
+    @Override
+    public void hideProgress() {
+
+    }
+
+    @Override
+    public void showMsg(String msg) {
+
+
     }
 }

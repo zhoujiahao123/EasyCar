@@ -2,8 +2,10 @@ package com.jacob.www.easycar.login;
 
 import android.util.Log;
 
+import com.jacob.www.easycar.R;
 import com.jacob.www.easycar.base.App;
 import com.jacob.www.easycar.data.UserBean;
+import com.jacob.www.easycar.net.LoadingCallBack;
 import com.zxr.medicalaid.DaoSession;
 import com.zxr.medicalaid.User;
 import com.zxr.medicalaid.UserDao;
@@ -18,35 +20,40 @@ public class LogInPresenter implements LogInContract.Presenter {
     User user = new User();
     Model model = new LogInModelImpl();
     LogInContract.View view;
-    public LogInPresenter(LogInContract.View view){
-        view.setPresenter(this);
+
+    public LogInPresenter(LogInContract.View view) {
         this.view = view;
     }
 
 
     @Override
     public void logIn(String phoneNum, String pas) {
-        model.logIn(new Model.LoadingCallBack() {
+        view.showProgress();
+        model.logIn(new LoadingCallBack<UserBean>() {
             @Override
             public void loaded(UserBean userBean) {
-                Log.e("TAG","loaded");
-                if(userBean.getCode()==200){
-                    user.setIcon(userBean.getData().getIcon());
-                    user.setUId(userBean.getData().getUid());
-                    user.setPhoneNum(userBean.getData().getPhone());
-                    user.setUserName(userBean.getData().getUsername());
-                    userDao.insert(user);
-                    view.logInSucceed();
-                }else {
-                    view.logInFailed();
-                }
+                Log.e("TAG", "loaded");
+                view.hideProgress();
+                user.setIcon(userBean.getIcon());
+                user.setUId(userBean.getUid());
+                user.setPhoneNum(userBean.getPhone());
+                user.setUserName(userBean.getUsername());
+                userDao.insert(user);
+                view.logInSucceed();
+                view.showMsg(App.getAppContext().getString(R.string.login_success));
             }
-        },phoneNum,pas);
+
+            @Override
+            public void error(String msg) {
+                view.hideProgress();
+                view.showMsg(msg);
+            }
+        }, phoneNum, pas);
     }
 
     @Override
     public void start(String... args) {
-        logIn(args[0],args[1]);
-        Log.e("TAG","start");
+        logIn(args[0], args[1]);
+        Log.e("TAG", "start");
     }
 }

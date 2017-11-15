@@ -3,8 +3,11 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/EasyCar.iml" filepath="$PROJECT_DIR$/EasyCar.iml" />
+      <module fileurl="file://D:/Android Project/EasyCar/EasyCar.iml" filepath="D:/Android Project/EasyCar/EasyCar.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://D:/Android Project/EasyCar/app/app.iml" filepath="D:/Android Project/EasyCar/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/lib/lib.iml" filepath="$PROJECT_DIR$/lib/lib.iml" />
+      <module fileurl="file://D:/Android Project/EasyCar/lib/lib.iml" filepath="D:/Android Project/EasyCar/lib/lib.iml" />
     </modules>
   </component>
 </project>
