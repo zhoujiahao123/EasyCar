@@ -8,4 +8,18 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="FullScreenActivityTheme" parent="NoActionBarActivityTheme">
+        <item name="android:windowFullscreen">true</item>
+    </style>
+    <style name="NoActionBarActivityTheme" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Custom.Widget.EditView" parent="Widget.AppCompat.EditText" >
+        <item name="colorAccent">@color/nobel</item>
+        <item name="colorControlNormal">@color/nobel</item>
+        <!-- AppCompatEditText选择的底线颜色 -->
+        <item name="colorControlActivated">@color/light_grey</item>
+    </style>
 </resources>

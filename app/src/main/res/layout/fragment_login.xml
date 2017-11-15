@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="100dp"
+        android:src="@mipmap/park1"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/margin_normal"
+        android:gravity="center"
+        android:text="@string/login_hint"
+        android:textColor="@color/dark_grey"
+        android:textSize="@dimen/font_normal"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/margin_large"
+        android:text="TEL-PHONE"
+        android:textColor="@color/light_grey"/>
+
+    <EditText
+        android:inputType="number"
+        android:id="@+id/username_input"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/margin_small"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:theme="@style/Custom.Widget.EditView"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/margin_large"
+        android:text="PASSWORD"
+        android:textColor="@color/light_grey"/>
+
+    <EditText
+        android:id="@+id/password_input"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/margin_small"
+        android:gravity="center"
+        android:inputType="textPassword"
+        android:theme="@style/Custom.Widget.EditView"/>
+
+    <Button
+        android:id="@+id/login_bt"
+        android:layout_width="260dp"
+        android:layout_height="@dimen/button_height"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/margin_normal"
+        android:background="@drawable/button_background"
+        android:text="LOG IN"
+        android:textColor="@color/white"
+        android:textSize="@dimen/font_normal"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/margin_large"
+        android:text="Not registered?"
+        android:textColor="@color/light_grey"/>
+
+</LinearLayout>

@@ -8,4 +8,5 @@ public interface BaseView<T> {
    void showProgress();
    void hideProgress();
    void showMsg(String msg);
+   void getDatas(T data);
 }

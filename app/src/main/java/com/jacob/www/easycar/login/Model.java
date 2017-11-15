@@ -1,5 +1,6 @@
 package com.jacob.www.easycar.login;
 
+import com.jacob.www.easycar.data.UserBean;
 import com.jacob.www.easycar.net.LoadingCallBack;
 
 /**
@@ -8,4 +9,6 @@ import com.jacob.www.easycar.net.LoadingCallBack;
 
 public interface Model {
     void logIn(LoadingCallBack callBack, String phoneNum, String pas);
+    
+    void signIn(LoadingCallBack<UserBean> callBack,String phoneNum,String pas);
 }

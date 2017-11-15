@@ -39,4 +39,29 @@ public class LogInModelImpl extends BaseModelImpl implements Model {
                     }
                 });
     }
+
+    @Override
+    public void signIn(final LoadingCallBack<UserBean> callBack, String phoneNum, String pas) {
+        filterStatus(api.signIn(phoneNum, pas)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new FilterSubscriber<UserBean>() {
+                    @Override
+                    public void onCompleted() {
+                        
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        callBack.error(e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(UserBean userBean) {
+                        callBack.loaded(userBean);
+                    }
+
+                  
+                });
+                 
+    }
 }

@@ -11,6 +11,16 @@ public class UserBean {
     private String uid;
     private String icon;
 
+    @Override
+    public String toString() {
+        return "UserBean{" +
+                "username='" + username + '\'' +
+                ", phone='" + phone + '\'' +
+                ", uid='" + uid + '\'' +
+                ", icon='" + icon + '\'' +
+                '}';
+    }
+
     public String getUsername() {
         return username;
     }

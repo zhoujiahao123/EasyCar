@@ -16,4 +16,8 @@ public interface Api {
     @FormUrlEncoded
     @POST("login")
     Observable<Data<UserBean>> logIn(@Field("phone") String phoneNum, @Field("password") String pas);
+    
+    @FormUrlEncoded
+    @POST("user")
+    Observable<Data<UserBean>> signIn(@Field("phone") String phoneNum,@Field("password") String password);
 }

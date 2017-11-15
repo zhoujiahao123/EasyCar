@@ -8,7 +8,7 @@ import com.jacob.www.easycar.base.BaseView;
  */
 
 public interface MainContract {
-    interface View  extends BaseView<Presenter>{
+    interface View  extends BaseView{
    
     }
     interface Presenter extends BasePresenter{

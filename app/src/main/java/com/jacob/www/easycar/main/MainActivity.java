@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.CameraUpdateFactory;
@@ -381,7 +382,12 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void showMsg(String msg) {
-
-
+        Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    public void getDatas(Object data) {
+        
+    }
+    
 }

@@ -7,4 +7,8 @@
     <string name="loading">加载中...</string>
     <string name="success">成功</string>
     <string name="failed">失败</string>
+    <string name="login_hint">Log in to find \n the best park location</string>
+    <string name="sign_title">sign in to get \n  the service</string>
+    <string name="please_watting">请稍后...</string>
+    <string name="logining_please_waitting">登录中，请稍后...</string>
 </resources>

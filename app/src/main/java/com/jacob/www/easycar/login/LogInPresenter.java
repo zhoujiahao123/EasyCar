@@ -39,7 +39,6 @@ public class LogInPresenter implements LogInContract.Presenter {
                 user.setPhoneNum(userBean.getPhone());
                 user.setUserName(userBean.getUsername());
                 userDao.insert(user);
-                view.logInSucceed();
                 view.showMsg(App.getAppContext().getString(R.string.login_success));
             }
 
@@ -49,6 +48,24 @@ public class LogInPresenter implements LogInContract.Presenter {
                 view.showMsg(msg);
             }
         }, phoneNum, pas);
+    }
+
+    @Override
+    public void signIn(String phoneNum, String pas) {
+        view.showProgress();
+        model.signIn(new LoadingCallBack<UserBean>() {
+            @Override
+            public void loaded(UserBean userBean) {
+                view.hideProgress();
+                
+            }
+
+            @Override
+            public void error(String msg) {
+                view.hideProgress();
+                view.showMsg(msg);
+            }
+        },phoneNum,pas);
     }
 
     @Override
