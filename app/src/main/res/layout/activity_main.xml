@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#ffffff"
     tools:context="com.jacob.www.easycar.main.MainActivity">
 
     <com.amap.api.navi.AMapNaviView
@@ -25,16 +26,33 @@
         android:layout_alignParentBottom="true"/>
 
     <com.arlib.floatingsearchview.FloatingSearchView
-        android:layout_centerInParent="true"
         android:id="@+id/floating_search_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:floatingSearch_searchBarMarginLeft="@dimen/margin_normal"
-        app:floatingSearch_searchBarMarginTop="@dimen/margin_small"
-        app:floatingSearch_searchBarMarginRight="@dimen/margin_normal"
-        app:floatingSearch_searchHint="Where you want to go?"
-        app:floatingSearch_suggestionsListAnimDuration="300"
-        app:floatingSearch_showSearchKey="false"
+        android:layout_centerInParent="true"
+        app:floatingSearch_close_search_on_keyboard_dismiss="true"
         app:floatingSearch_leftActionMode="showSearch"
-        app:floatingSearch_close_search_on_keyboard_dismiss="true"/>
+        app:floatingSearch_searchBarMarginLeft="@dimen/margin_normal"
+        app:floatingSearch_searchBarMarginRight="@dimen/margin_normal"
+        app:floatingSearch_searchBarMarginTop="@dimen/margin_small"
+        app:floatingSearch_searchHint="Where you want to go?"
+        app:floatingSearch_showSearchKey="false"
+        app:floatingSearch_suggestionsListAnimDuration="300"/>
+    android:layout_height="match_parent" />
+
+    <com.gigamole.infinitecycleviewpager.HorizontalInfiniteCycleViewPager
+        android:id="@+id/hicvp"
+        android:layout_width="350dp"
+        android:layout_height="250dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        app:icvp_center_page_scale_offset="30dp"
+        app:icvp_interpolator="@android:anim/accelerate_decelerate_interpolator"
+        app:icvp_max_page_scale="0.8"
+        app:icvp_medium_scaled="false"
+        app:icvp_min_page_scale="0.55"
+        app:icvp_min_page_scale_offset="5dp"
+        app:icvp_scroll_duration="250"/>
+
 </RelativeLayout>

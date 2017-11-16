@@ -37,14 +37,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".main.MainActivity"
-            android:theme="@style/NoActionBarActivityTheme"
-            >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
+        <activity
+            android:name=".main.MainActivity"
+            android:theme="@style/NoActionBarActivityTheme">
         </activity>
         <service android:name="com.amap.api.location.APSService"></service>
         <meta-data
@@ -53,7 +48,11 @@
         <activity
             android:name=".login.LogInActivity"
             android:theme="@style/NoActionBarActivityTheme">
-           
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
     </application>
 

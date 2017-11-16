@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    buildToolsVersion "26.0.1"
     defaultConfig {
         applicationId "com.jacob.www.easycar"
         minSdkVersion 16
@@ -53,4 +53,7 @@ dependencies {
     //搜索框
     compile 'com.github.arimorty:floatingsearchview:2.0.3'
     compile 'com.amap.api:search:latest.integration'
+    compile files('libs/jsms_android-1.2.0.jar')
+    compile 'com.github.devlight:infinitecycleviewpager:1.0.2'
+
 }

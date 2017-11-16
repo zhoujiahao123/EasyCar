@@ -28,12 +28,18 @@ import com.amap.api.navi.model.AimLessModeCongestionInfo;
 import com.amap.api.navi.model.AimLessModeStat;
 import com.amap.api.navi.model.NaviInfo;
 import com.amap.api.navi.model.NaviLatLng;
+import com.amap.api.services.core.LatLonPoint;
+import com.amap.api.services.geocoder.GeocodeQuery;
+import com.amap.api.services.geocoder.GeocodeResult;
+import com.amap.api.services.geocoder.GeocodeSearch;
+import com.amap.api.services.geocoder.RegeocodeResult;
 import com.amap.api.services.help.Inputtips;
 import com.amap.api.services.help.InputtipsQuery;
 import com.amap.api.services.help.Tip;
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 import com.autonavi.tbt.TrafficFacilityInfo;
+import com.gigamole.infinitecycleviewpager.HorizontalInfiniteCycleViewPager;
 import com.jacob.www.easycar.R;
 import com.jacob.www.easycar.base.App;
 import com.jacob.www.easycar.data.SearchSuggestionItem;
@@ -45,7 +51,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends AppCompatActivity implements MainContract.View, AMapNaviListener, AMapNaviViewListener, AMap.OnMyLocationChangeListener, FloatingSearchView.OnQueryChangeListener, FloatingSearchView.OnSearchListener, Inputtips.InputtipsListener {
+public class MainActivity extends AppCompatActivity implements MainContract.View, AMapNaviListener, AMapNaviViewListener, AMap.OnMyLocationChangeListener, FloatingSearchView.OnQueryChangeListener, FloatingSearchView.OnSearchListener, Inputtips.InputtipsListener, GeocodeSearch.OnGeocodeSearchListener {
     private String TAG = "MainActivity";
     AMapNavi mAMapNavi;
     MainContract.Presenter presenter;
@@ -66,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     /**
      * 关键字搜索相关
      */
+    GeocodeSearch geocodeSearch;
     InputtipsQuery query;
     Inputtips inputTips;
 
@@ -83,14 +90,32 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         presenter = new MainPresenter(this);
 
         initView(savedInstanceState);
-
+        ceshi();
+    }
+    
+    private void ceshi(){
+        HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager = (HorizontalInfiniteCycleViewPager) findViewById(R.id.hicvp);
+        MainAdapter adapter = new MainAdapter(getSupportFragmentManager());
+        RouteFragment fragment1 = new RouteFragment();
+        CeshiFragment fragment2 = new CeshiFragment();
+        CeFragment fragment3 = new CeFragment();
+        FiveFragment fiveFragment = new FiveFragment();
+        ForthFragment forthFragment = new ForthFragment();
+        adapter.addFragment(fragment1);
+        adapter.addFragment(fragment2);
+        adapter.addFragment(fragment3);
+        adapter.addFragment(fiveFragment);
+        adapter.addFragment(forthFragment);
+        horizontalInfiniteCycleViewPager.setAdapter(adapter);
     }
 
-
+    
     private void initView(Bundle savedInstanceState) {
         mSearchView.setOnQueryChangeListener(this);
         mSearchView.setOnSearchListener(this);
         //搜索功能初始化
+        geocodeSearch = new GeocodeSearch(this);
+        geocodeSearch.setOnGeocodeSearchListener(this);
         inputTips = new Inputtips(this, query);
         inputTips.setInputtipsListener(this);
         //地图
@@ -392,6 +417,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     }
 
+
     @OnClick(R.id.btn)
     public void onClick() {
         startNavi(29.568711, 106.550721);
@@ -427,12 +453,14 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     public void onSuggestionClicked(SearchSuggestion searchSuggestion) {
            SearchSuggestionItem item = (SearchSuggestionItem) searchSuggestion;
            Log.i(TAG,item.getSuggestoin());
-           Log.i(TAG,item.getLatLonPoint().getLatitude()+"");
+           Log.i(TAG,item.getLatLonPoint().getLatitude()+""+item.getLatLonPoint().getLongitude()+"");
     }
 
     @Override
     public void onSearchAction(String currentQuery) {
         Log.i(TAG, "currentQuery" + currentQuery);
+        GeocodeQuery query = new GeocodeQuery(currentQuery, currentCity);
+        geocodeSearch.getFromLocationNameAsyn(query);
     }
 
 
@@ -444,5 +472,32 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             
         }
         mSearchView.swapSuggestions(suggestionItems);
+    }
+
+    /**
+     * 坐标转文字
+     *
+     * @param regeocodeResult
+     * @param i
+     */
+    @Override
+    public void onRegeocodeSearched(RegeocodeResult regeocodeResult, int i) {
+        
+    }
+
+    /**
+     * 文字转坐标
+     *
+     * @param geocodeResult
+     * @param i
+     */
+    @Override
+    public void onGeocodeSearched(GeocodeResult geocodeResult, int i) {
+      if (i == 1000){
+          //请求成功,得到经纬度
+          LatLonPoint latLonPoint = geocodeResult.getGeocodeAddressList().get(0).getLatLonPoint();
+          Log.i(TAG,latLonPoint.getLatitude()+" "+latLonPoint.getLongitude()+"");
+          //发起请求
+      }
     }
 }

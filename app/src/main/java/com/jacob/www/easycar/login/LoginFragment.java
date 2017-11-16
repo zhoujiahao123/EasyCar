@@ -62,7 +62,7 @@ public class LoginFragment extends BaseFragment implements LogInContract.View {
 
     @Override
     public void success() {
-        SpUtil.putBoolean(getContext(),"has_login",true);
+        SpUtil.putBoolean(getContext(), "has_login", true);
         ToActivityUtil.toNextActivityAndFinish(getContext(), MainActivity.class);
     }
 }
