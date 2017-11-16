@@ -77,7 +77,8 @@
             android:gravity="center"
             android:theme="@style/Custom.Widget.EditView"/>
 
-        <Button
+        <com.jacob.www.easycar.widget.VerifyButton
+            android:gravity="center"
             android:id="@+id/send_verification"
             android:layout_width="0dp"
             android:layout_height="36dp"
