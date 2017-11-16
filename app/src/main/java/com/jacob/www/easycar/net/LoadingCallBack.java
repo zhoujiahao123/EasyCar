@@ -5,6 +5,6 @@ package com.jacob.www.easycar.net;
  */
 
 public interface LoadingCallBack<T> {
-    void loaded(T userBean);
+    void loaded(T data);
     void error(String msg);
 }

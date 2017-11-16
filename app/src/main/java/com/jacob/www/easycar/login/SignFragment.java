@@ -1,14 +1,10 @@
 package com.jacob.www.easycar.login;
 
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.jacob.www.easycar.R;
 import com.jacob.www.easycar.base.BaseFragment;
-import com.jacob.www.easycar.data.UserBean;
-import com.jacob.www.easycar.util.ProgressDialogUtils;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -33,9 +29,10 @@ public class SignFragment extends BaseFragment implements LogInContract.View {
     }
 
     @Override
-    public void getData() {
-
+    public void getActivityData() {
+        
     }
+    
 
     @Override
     public void init() {
@@ -63,23 +60,11 @@ public class SignFragment extends BaseFragment implements LogInContract.View {
         }
     }
 
-    @Override
-    public void showProgress() {
-        ProgressDialogUtils.getInstance().showProgress(getContext(),getString(R.string.please_watting));
-    }
 
     @Override
-    public void hideProgress() {
-        ProgressDialogUtils.getInstance().hideProgress();
-    }
-
-    @Override
-    public void showMsg(String msg) {
-        Toast.makeText(getContext(),msg,Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void getDatas(UserBean data) {
-        Log.i(TAG,data.toString());
+    public void success() {
+        //清除
+        usernameInput.setText("");
+        passwordInput.setText("");
     }
 }

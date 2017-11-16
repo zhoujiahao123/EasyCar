@@ -57,7 +57,7 @@ public class LogInPresenter implements LogInContract.Presenter {
             @Override
             public void loaded(UserBean userBean) {
                 view.hideProgress();
-                
+                view.success();
             }
 
             @Override

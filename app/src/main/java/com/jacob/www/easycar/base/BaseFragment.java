@@ -6,6 +6,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
+import com.jacob.www.easycar.util.ProgressDialogUtils;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -14,13 +17,13 @@ import butterknife.Unbinder;
  * Created by 张兴锐 on 2017/11/15.
  */
 
-public abstract class BaseFragment extends Fragment {
+public abstract class BaseFragment extends Fragment implements BaseView{
 
     Unbinder unbinder;
     protected Bundle args;
     protected String TAG;
     public abstract int getLayoutId();
-    public abstract void getData();
+    public abstract void getActivityData();
     public abstract void init();
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -28,7 +31,7 @@ public abstract class BaseFragment extends Fragment {
         TAG = this.getClass().getSimpleName();
         if(getArguments() != null){
             args = getArguments();
-            getData();
+            getActivityData();
         }
     }
 
@@ -46,4 +49,20 @@ public abstract class BaseFragment extends Fragment {
         super.onDestroyView();
         unbinder.unbind();
     }
+    @Override
+    public void showProgress() {
+        ProgressDialogUtils.getInstance().showProgress(getContext(),"加载中，请稍后...");
+    }
+
+    @Override
+    public void hideProgress() {
+        ProgressDialogUtils.getInstance().hideProgress();
+    }
+
+    @Override
+    public void showMsg(String msg) {
+        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+    }
+
+  
 }

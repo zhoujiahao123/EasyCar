@@ -22,7 +22,10 @@ public class StatusUtils {
                 desc = App.getAppContext().getString(R.string.success);
                 isSuccess = true;
                 break;
-           default:
+            case 403:
+                desc = App.getAppContext().getString(R.string.login_failed_phoneNum_wrong_or_passWord_wrong);
+                break;
+            default:
                 desc = App.getAppContext().getString(R.string.failed);
                 break;
         }

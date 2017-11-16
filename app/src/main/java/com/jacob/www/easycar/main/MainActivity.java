@@ -385,9 +385,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public void getDatas(Object data) {
-        
-    }
+
     
 }
