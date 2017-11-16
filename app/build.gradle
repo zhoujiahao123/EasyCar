@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    buildToolsVersion "26.0.1"
     defaultConfig {
         applicationId "com.jacob.www.easycar"
         minSdkVersion 15
@@ -50,4 +50,6 @@ dependencies {
     compile files('libs/AMap_Location_V3.6.1_20171012.jar')
     //指示器
     compile 'com.romandanylyk:pageindicatorview:0.0.4'
+    compile files('libs/jsms_android-1.2.0.jar')
+    compile 'com.github.devlight:infinitecycleviewpager:1.0.2'
 }

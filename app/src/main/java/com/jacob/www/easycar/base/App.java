@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import com.zxr.medicalaid.DaoMaster;
 import com.zxr.medicalaid.DaoSession;
 
+import cn.jpush.sms.SMSSDK;
+
 /**
  * Created by ASUS-NB on 2017/11/12.
  */
@@ -21,6 +23,7 @@ public class App extends Application{
     public void onCreate() {
         super.onCreate();
         context = this;
+        SMSSDK.getInstance().initSdk(this);
     }
     static DaoSession daoSession;
     static DaoMaster daoMaster;

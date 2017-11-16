@@ -29,6 +29,7 @@ import com.amap.api.navi.model.AimLessModeStat;
 import com.amap.api.navi.model.NaviInfo;
 import com.amap.api.navi.model.NaviLatLng;
 import com.autonavi.tbt.TrafficFacilityInfo;
+import com.gigamole.infinitecycleviewpager.HorizontalInfiniteCycleViewPager;
 import com.jacob.www.easycar.R;
 import com.jacob.www.easycar.base.App;
 
@@ -64,9 +65,23 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         ButterKnife.bind(this);
         presenter = new MainPresenter(this);
         initView(savedInstanceState);
-
+        ceshi();
     }
-
+    private void ceshi(){
+        HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager = (HorizontalInfiniteCycleViewPager) findViewById(R.id.hicvp);
+        MainAdapter adapter = new MainAdapter(getSupportFragmentManager());
+        RouteFragment fragment1 = new RouteFragment();
+        CeshiFragment fragment2 = new CeshiFragment();
+        CeFragment fragment3 = new CeFragment();
+        FiveFragment fiveFragment = new FiveFragment();
+        ForthFragment forthFragment = new ForthFragment();
+        adapter.addFragment(fragment1);
+        adapter.addFragment(fragment2);
+        adapter.addFragment(fragment3);
+        adapter.addFragment(fiveFragment);
+        adapter.addFragment(forthFragment);
+        horizontalInfiniteCycleViewPager.setAdapter(adapter);
+    }
     private void initView(Bundle savedInstanceState) {
         mAMapNaviView = (AMapNaviView) findViewById(R.id.navi_view);
         mAMapNaviView.onCreate(savedInstanceState);
@@ -116,8 +131,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     public void onMyLocationChange(Location location) {
         myLatitude = location.getLatitude();
         myLongitude = location.getLongitude();
-
-
     }
 
 
@@ -365,10 +378,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     @Override
     public void onNaviViewLoaded() {
 
-    }
-    @OnClick(R.id.btn)
-    public void onClick() {
-        startNavi(29.568711, 106.550721);
     }
     @Override
     public void showProgress() {
