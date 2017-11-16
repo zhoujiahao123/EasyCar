@@ -71,6 +71,7 @@ public class SignFragment extends BaseFragment implements LogInContract.View {
         //清除
         usernameInput.setText("");
         passwordInput.setText("");
+        RxBus.getDefault().post(new Integer(0));
     }
-    
+
 }

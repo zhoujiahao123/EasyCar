@@ -40,6 +40,7 @@ public class LogInPresenter implements LogInContract.Presenter {
                 user.setUserName(userBean.getUsername());
                 userDao.insert(user);
                 view.showMsg(App.getAppContext().getString(R.string.login_success));
+                view.success();
             }
 
             @Override

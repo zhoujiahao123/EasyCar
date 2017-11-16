@@ -5,7 +5,10 @@ import android.support.v4.view.ViewPager;
 
 import com.jacob.www.easycar.R;
 import com.jacob.www.easycar.base.BaseActivity;
+import com.jacob.www.easycar.main.MainActivity;
 import com.jacob.www.easycar.util.RxBus;
+import com.jacob.www.easycar.util.SpUtil;
+import com.jacob.www.easycar.util.ToActivityUtil;
 import com.rd.PageIndicatorView;
 
 import java.util.ArrayList;
@@ -35,6 +38,9 @@ public class LogInActivity extends BaseActivity {
 
     @Override
     public void init() {
+        if(SpUtil.getBoolean(this,"has_login",false)){
+            ToActivityUtil.toNextActivityAndFinish(this, MainActivity.class);
+        }
         //加入Fragment
         Fragment loginFragment = new LoginFragment();
         Fragment signFragment = new SignFragment();

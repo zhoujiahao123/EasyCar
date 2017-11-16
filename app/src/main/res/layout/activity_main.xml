@@ -11,14 +11,30 @@
         android:id="@+id/navi_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone" />
+        android:visibility="gone"/>
+
     <com.amap.api.maps.MapView
         android:id="@+id/map"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"/>
+
     <Button
         android:id="@+id/btn"
         android:layout_width="88dp"
         android:layout_height="wrap_content"
- />
+        android:layout_alignParentBottom="true"/>
+
+    <com.arlib.floatingsearchview.FloatingSearchView
+        android:layout_centerInParent="true"
+        android:id="@+id/floating_search_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:floatingSearch_searchBarMarginLeft="@dimen/margin_normal"
+        app:floatingSearch_searchBarMarginTop="@dimen/margin_small"
+        app:floatingSearch_searchBarMarginRight="@dimen/margin_normal"
+        app:floatingSearch_searchHint="Where you want to go?"
+        app:floatingSearch_suggestionsListAnimDuration="300"
+        app:floatingSearch_showSearchKey="false"
+        app:floatingSearch_leftActionMode="showSearch"
+        app:floatingSearch_close_search_on_keyboard_dismiss="true"/>
 </RelativeLayout>

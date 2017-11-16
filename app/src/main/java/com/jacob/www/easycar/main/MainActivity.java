@@ -28,17 +28,25 @@ import com.amap.api.navi.model.AimLessModeCongestionInfo;
 import com.amap.api.navi.model.AimLessModeStat;
 import com.amap.api.navi.model.NaviInfo;
 import com.amap.api.navi.model.NaviLatLng;
+import com.amap.api.services.help.Inputtips;
+import com.amap.api.services.help.InputtipsQuery;
+import com.amap.api.services.help.Tip;
+import com.arlib.floatingsearchview.FloatingSearchView;
+import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 import com.autonavi.tbt.TrafficFacilityInfo;
 import com.jacob.www.easycar.R;
 import com.jacob.www.easycar.base.App;
+import com.jacob.www.easycar.data.SearchSuggestionItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends AppCompatActivity implements MainContract.View, AMapNaviListener, AMapNaviViewListener, AMap.OnMyLocationChangeListener {
+public class MainActivity extends AppCompatActivity implements MainContract.View, AMapNaviListener, AMapNaviViewListener, AMap.OnMyLocationChangeListener, FloatingSearchView.OnQueryChangeListener, FloatingSearchView.OnSearchListener, Inputtips.InputtipsListener {
+    private String TAG = "MainActivity";
     AMapNavi mAMapNavi;
     MainContract.Presenter presenter;
     //起始点经纬度
@@ -54,8 +62,18 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     AMap aMap;
     //定位的style
     MyLocationStyle myLocationStyle;
+    String currentCity;
+    /**
+     * 关键字搜索相关
+     */
+    InputtipsQuery query;
+    Inputtips inputTips;
+
     //目前我所在位置的经纬度
     double myLongitude = 0, myLatitude = 0;
+    @BindView(R.id.floating_search_view)
+    FloatingSearchView mSearchView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,11 +81,19 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         presenter = new MainPresenter(this);
+
         initView(savedInstanceState);
 
     }
 
+
     private void initView(Bundle savedInstanceState) {
+        mSearchView.setOnQueryChangeListener(this);
+        mSearchView.setOnSearchListener(this);
+        //搜索功能初始化
+        inputTips = new Inputtips(this, query);
+        inputTips.setInputtipsListener(this);
+        //地图
         mAMapNaviView = (AMapNaviView) findViewById(R.id.navi_view);
         mAMapNaviView.onCreate(savedInstanceState);
 
@@ -116,15 +142,14 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     public void onMyLocationChange(Location location) {
         myLatitude = location.getLatitude();
         myLongitude = location.getLongitude();
-
+        currentCity = location.getProvider();
 
     }
 
 
-
     @Override
     protected void onResume() {
-        Log.e("TAG","onResume");
+        Log.e("TAG", "onResume");
         super.onResume();
         mAMapNaviView.onResume();
         mMapView.onResume();
@@ -132,14 +157,14 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     protected void onPause() {
-        Log.e("TAG","onResume");
+        Log.e("TAG", "onResume");
         super.onPause();
         mAMapNaviView.onPause();
         mMapView.onPause();
     }
 
     protected void onDestroy() {
-        Log.e("TAG","onResume");
+        Log.e("TAG", "onResume");
         super.onDestroy();
         mAMapNaviView.onDestroy();
         mAMapNavi.stopNavi();
@@ -366,13 +391,15 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     public void onNaviViewLoaded() {
 
     }
+
     @OnClick(R.id.btn)
     public void onClick() {
         startNavi(29.568711, 106.550721);
     }
+
     @Override
     public void showProgress() {
-        
+
     }
 
     @Override
@@ -382,9 +409,40 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void showMsg(String msg) {
-        Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onSearchTextChanged(String oldQuery, String newQuery) {
+        if (!newQuery.equals("")) {
+            Log.i(TAG, "oldQuery" + oldQuery + " " + "new" + newQuery);
+            query = new InputtipsQuery(newQuery, currentCity);
+            inputTips.setQuery(query);
+            inputTips.requestInputtipsAsyn();
+        }
+
+    }
+
+    @Override
+    public void onSuggestionClicked(SearchSuggestion searchSuggestion) {
+           SearchSuggestionItem item = (SearchSuggestionItem) searchSuggestion;
+           Log.i(TAG,item.getSuggestoin());
+           Log.i(TAG,item.getLatLonPoint().getLatitude()+"");
+    }
+
+    @Override
+    public void onSearchAction(String currentQuery) {
+        Log.i(TAG, "currentQuery" + currentQuery);
     }
 
 
-    
+    @Override
+    public void onGetInputtips(List<Tip> list, int i) {
+        List<SearchSuggestionItem> suggestionItems = new ArrayList<>();
+        for (Tip tip : list) {
+            suggestionItems.add(new SearchSuggestionItem(tip.getName(),tip.getPoint()));
+            
+        }
+        mSearchView.swapSuggestions(suggestionItems);
+    }
 }

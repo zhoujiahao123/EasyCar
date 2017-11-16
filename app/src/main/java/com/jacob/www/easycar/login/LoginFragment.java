@@ -5,7 +5,10 @@ import android.widget.EditText;
 
 import com.jacob.www.easycar.R;
 import com.jacob.www.easycar.base.BaseFragment;
+import com.jacob.www.easycar.main.MainActivity;
 import com.jacob.www.easycar.util.RxBus;
+import com.jacob.www.easycar.util.SpUtil;
+import com.jacob.www.easycar.util.ToActivityUtil;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -59,6 +62,7 @@ public class LoginFragment extends BaseFragment implements LogInContract.View {
 
     @Override
     public void success() {
-
+        SpUtil.putBoolean(getContext(),"has_login",true);
+        ToActivityUtil.toNextActivityAndFinish(getContext(), MainActivity.class);
     }
 }
