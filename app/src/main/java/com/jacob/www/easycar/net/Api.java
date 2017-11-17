@@ -1,11 +1,16 @@
 package com.jacob.www.easycar.net;
 
 import com.jacob.www.easycar.data.Data;
+import com.jacob.www.easycar.data.GarageBean;
 import com.jacob.www.easycar.data.UserBean;
+
+import java.util.List;
 
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Query;
 import rx.Observable;
 
 /**
@@ -20,4 +25,8 @@ public interface Api {
     @FormUrlEncoded
     @POST("user")
     Observable<Data<UserBean>> signIn(@Field("phone") String phoneNum,@Field("password") String password);
+
+    @GET("garage/near")
+    Observable<Data<GarageBean>> getNearGarage(@Query("longitude") double longitude, @Query("latitude") double latitude, @Query("distance") double distance);
+
 }

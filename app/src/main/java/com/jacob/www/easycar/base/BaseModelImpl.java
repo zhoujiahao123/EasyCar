@@ -1,5 +1,7 @@
 package com.jacob.www.easycar.base;
 
+import android.util.Log;
+
 import com.jacob.www.easycar.data.Data;
 import com.jacob.www.easycar.net.Api;
 import com.jacob.www.easycar.net.ApiException;
@@ -44,7 +46,9 @@ public class BaseModelImpl {
         @Override
         public T call(Data<T> tHttpBean) {
             if (tHttpBean.getCode() != 200) {
+                Log.e("ResultFilter","这里失败");
                 throw new ApiException(tHttpBean.getCode());
+
             }
             return tHttpBean.getData();
         }
@@ -62,11 +66,13 @@ public class BaseModelImpl {
                     public void onError(Throwable e) {
                          super.onError(e);
                         callBack.error(error);
+                        Log.e("httpRequest","这里失败");
                     }
 
                     @Override
                     public void onNext(T data) {
                         callBack.loaded(data);
+                        Log.e("httpRequest","这里完成");
                     }
                 });
         

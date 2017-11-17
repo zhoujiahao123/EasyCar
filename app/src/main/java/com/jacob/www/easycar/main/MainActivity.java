@@ -42,6 +42,7 @@ import com.autonavi.tbt.TrafficFacilityInfo;
 import com.gigamole.infinitecycleviewpager.HorizontalInfiniteCycleViewPager;
 import com.jacob.www.easycar.R;
 import com.jacob.www.easycar.base.App;
+import com.jacob.www.easycar.data.GarageBean;
 import com.jacob.www.easycar.data.SearchSuggestionItem;
 
 import java.util.ArrayList;
@@ -90,24 +91,10 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         presenter = new MainPresenter(this);
 
         initView(savedInstanceState);
-        ceshi();
+
     }
     
-    private void ceshi(){
-        HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager = (HorizontalInfiniteCycleViewPager) findViewById(R.id.hicvp);
-        MainAdapter adapter = new MainAdapter(getSupportFragmentManager());
-        RouteFragment fragment1 = new RouteFragment();
-        CeshiFragment fragment2 = new CeshiFragment();
-        CeFragment fragment3 = new CeFragment();
-        FiveFragment fiveFragment = new FiveFragment();
-        ForthFragment forthFragment = new ForthFragment();
-        adapter.addFragment(fragment1);
-        adapter.addFragment(fragment2);
-        adapter.addFragment(fragment3);
-        adapter.addFragment(fiveFragment);
-        adapter.addFragment(forthFragment);
-        horizontalInfiniteCycleViewPager.setAdapter(adapter);
-    }
+
 
     
     private void initView(Bundle savedInstanceState) {
@@ -418,10 +405,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
 
-    @OnClick(R.id.btn)
-    public void onClick() {
-        startNavi(29.568711, 106.550721);
-    }
+
 
     @Override
     public void showProgress() {
@@ -497,7 +481,26 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
           //请求成功,得到经纬度
           LatLonPoint latLonPoint = geocodeResult.getGeocodeAddressList().get(0).getLatLonPoint();
           Log.i(TAG,latLonPoint.getLatitude()+" "+latLonPoint.getLongitude()+"");
+          Log.e(TAG,"开始搜索车库");
+          presenter.getNearGarage(106.61392,29.53832,1);
           //发起请求
       }
+    }
+
+    @Override
+    public void showGarage(GarageBean garageBean) {
+        HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager = (HorizontalInfiniteCycleViewPager) findViewById(R.id.hicvp);
+        MainAdapter adapter = new MainAdapter(getSupportFragmentManager());
+        for(int i=0;i<garageBean.getData().size();i++){
+            RouteFragment fragment = new RouteFragment();
+            Bundle bundle = fragment.getArguments();
+            bundle.putInt("freeGarageLot", garageBean.getData().get(i).getFreeParkingLotCount());
+            bundle.putInt("garageLot", garageBean.getData().get(i).getParkingLotCount());
+            bundle.putString("garageName", garageBean.getData().get(i).getGarageName());
+            bundle.putDouble("lat", garageBean.getData().get(i).getPositionLatitude());
+            bundle.putDouble("long", garageBean.getData().get(i).getPositionLongitude());
+            adapter.addFragment(fragment);
+        }
+        horizontalInfiniteCycleViewPager.setAdapter(adapter);
     }
 }
