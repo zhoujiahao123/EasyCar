@@ -128,6 +128,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
      * 开始导航,根据经纬度
      */
     public void startNavi(double latitude, double longitude) {
+        isSimulate = false;
+        mAMapNavi.stopNavi();
         double myLatitude = this.myLatitude;
         double myLongitude = this.myLongitude;
         Log.e("TAG", "收到的经纬度" + latitude + " " + longitude);
@@ -320,8 +322,16 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     //算路成功后执行的
     @Override
     public void onCalculateRouteSuccess(int[] ints) {
-        Log.e("TAG", "开始导航");
-        mAMapNavi.startNavi(NaviType.GPS);
+
+        if(!isSimulate){
+            Log.e(TAG,"GPS");
+            mAMapNavi.startNavi(NaviType.GPS);
+        }
+        else{
+            Log.e(TAG,"EMULATOR");
+            mAMapNavi.startNavi(NaviType.EMULATOR);
+        }
+
     }
 
     @Override
@@ -482,25 +492,38 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
           LatLonPoint latLonPoint = geocodeResult.getGeocodeAddressList().get(0).getLatLonPoint();
           Log.i(TAG,latLonPoint.getLatitude()+" "+latLonPoint.getLongitude()+"");
           Log.e(TAG,"开始搜索车库");
-          presenter.getNearGarage(106.61392,29.53832,1);
+          presenter.getNearGarage(latLonPoint.getLongitude(),latLonPoint.getLatitude(),2);
           //发起请求
       }
     }
-
+    boolean isSimulate = false;
+    public void getRealItem(){
+        isSimulate = true;
+        int pos=horizontalInfiniteCycleViewPager.getRealItem();
+        double lat = bean.getData().get(pos).getPositionLatitude();
+        double lon = bean.getData().get(pos).getPositionLongitude();
+        sList.clear();
+        eList.clear();
+        sList.add(new NaviLatLng(myLatitude,myLongitude));
+        eList.add(new NaviLatLng(lat,lon));
+        mAMapNavi = AMapNavi.getInstance(App.getAppContext());
+        mAMapNaviView.setVisibility(View.VISIBLE);
+        mMapView.setVisibility(View.INVISIBLE);
+        //添加监听回调，用于处理算路成功
+        mAMapNavi.addAMapNaviListener(this);
+        mAMapNaviView.setAMapNaviViewListener(this);
+        AMapNaviViewOptions options = mAMapNaviView.getViewOptions();
+        options.setLayoutVisible(false);
+        mAMapNaviView.setViewOptions(options);
+        onInitNaviSuccess();
+    }
+    HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager;
+    GarageBean bean;
     @Override
     public void showGarage(GarageBean garageBean) {
-        HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager = (HorizontalInfiniteCycleViewPager) findViewById(R.id.hicvp);
-        MainAdapter adapter = new MainAdapter(getSupportFragmentManager());
-        for(int i=0;i<garageBean.getData().size();i++){
-            RouteFragment fragment = new RouteFragment();
-            Bundle bundle = fragment.getArguments();
-            bundle.putInt("freeGarageLot", garageBean.getData().get(i).getFreeParkingLotCount());
-            bundle.putInt("garageLot", garageBean.getData().get(i).getParkingLotCount());
-            bundle.putString("garageName", garageBean.getData().get(i).getGarageName());
-            bundle.putDouble("lat", garageBean.getData().get(i).getPositionLatitude());
-            bundle.putDouble("long", garageBean.getData().get(i).getPositionLongitude());
-            adapter.addFragment(fragment);
-        }
+        bean = garageBean;
+        horizontalInfiniteCycleViewPager = (HorizontalInfiniteCycleViewPager) findViewById(R.id.hicvp);
+        MainAdapter adapter = new MainAdapter(this,garageBean);
         horizontalInfiniteCycleViewPager.setAdapter(adapter);
     }
 }

@@ -27,6 +27,6 @@ public interface Api {
     Observable<Data<UserBean>> signIn(@Field("phone") String phoneNum,@Field("password") String password);
 
     @GET("garage/near")
-    Observable<Data<GarageBean>> getNearGarage(@Query("longitude") double longitude, @Query("latitude") double latitude, @Query("distance") double distance);
+    Observable<GarageBean> getNearGarage(@Query("longitude") double longitude, @Query("latitude") double latitude, @Query("distance") double distance);
 
 }

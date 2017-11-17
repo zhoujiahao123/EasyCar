@@ -8,8 +8,41 @@ import java.util.List;
 
 public class GarageBean {
 
+    /**
+     * code : 200
+     * message : 操作成功
+     * data : [{"garageId":"123456","garageName":"demo","parkingLotCount":3,"freeParkingLotCount":2,"positionLongitude":106.61392,"positionLatitude":29.53832,"parkingLotInfo":"101"}]
+     */
+
+    private int code;
+    private String message;
+    /**
+     * garageId : 123456
+     * garageName : demo
+     * parkingLotCount : 3
+     * freeParkingLotCount : 2
+     * positionLongitude : 106.61392
+     * positionLatitude : 29.53832
+     * parkingLotInfo : 101
+     */
 
     private List<DataBean> data;
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
     public List<DataBean> getData() {
         return data;

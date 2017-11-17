@@ -25,7 +25,7 @@ public class MainPresenter implements MainContract.Presenter {
             @Override
             public void loaded(Object data) {
                 Log.e("getNearGarage","搜索车库成功");
-                if(data instanceof ArrayList){
+                if(data instanceof GarageBean){
                     view.showGarage((GarageBean) data);
                 }
             }
