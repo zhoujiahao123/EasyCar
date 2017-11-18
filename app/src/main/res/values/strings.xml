@@ -8,8 +8,9 @@
     <string name="success">成功</string>
     <string name="failed">失败</string>
     <string name="login_hint">Log in to find \n the best park location</string>
-    <string name="sign_title">sign in to get \n  the service</string>
+    <string name="sign_title">Sign in to get \n  the service</string>
     <string name="please_watting">请稍后...</string>
     <string name="logining_please_waitting">登录中，请稍后...</string>
     <string name="login_failed_phoneNum_wrong_or_passWord_wrong">登录失败，电话号码或者密码错误</string>
+    <string name="verify_code_wrong">验证码错误，请重新输入</string>
 </resources>

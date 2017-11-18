@@ -59,7 +59,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity implements MainContract.View, AMapNaviListener, AMapNaviViewListener, AMap.OnMyLocationChangeListener, FloatingSearchView.OnQueryChangeListener, FloatingSearchView.OnSearchListener, Inputtips.InputtipsListener, GeocodeSearch.OnGeocodeSearchListener,RouteSearch.OnRouteSearchListener {
+public class MainActivity extends AppCompatActivity implements MainContract.View, AMapNaviListener, AMapNaviViewListener, AMap.OnMyLocationChangeListener, FloatingSearchView.OnQueryChangeListener, FloatingSearchView.OnSearchListener, Inputtips.InputtipsListener, GeocodeSearch.OnGeocodeSearchListener, RouteSearch.OnRouteSearchListener {
     private String TAG = "MainActivity";
     AMapNavi mAMapNavi;
     MainContract.Presenter presenter;
@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     //路径规划
     private RouteSearch mRouteSearch;
     private DriveRouteResult mDriveRouteResult;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,10 +102,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         initView(savedInstanceState);
 
     }
-    
 
 
-    
     private void initView(Bundle savedInstanceState) {
         mSearchView.setOnQueryChangeListener(this);
         mSearchView.setOnSearchListener(this);
@@ -116,19 +115,28 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         //地图
         mAMapNaviView = (AMapNaviView) findViewById(R.id.navi_view);
         mAMapNaviView.onCreate(savedInstanceState);
-
         mMapView = (MapView) findViewById(R.id.map);
         mMapView.onCreate(savedInstanceState);
+        
         if (aMap == null) {
             aMap = mMapView.getMap();
         }
+        aMap.getUiSettings().setMyLocationButtonEnabled(false);
+        aMap.getUiSettings().setZoomControlsEnabled(false);
+        aMap.getUiSettings().setZoomGesturesEnabled(true);
+        
+    
         myLocationStyle = new MyLocationStyle();
         myLocationStyle.interval(1000);
         myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);
+        myLocationStyle.strokeColor(R.color.colorPrimary);
+        myLocationStyle.radiusFillColor(getColor(R.color.touming));
+        myLocationStyle.strokeWidth(5);
         aMap.setMyLocationEnabled(true);
+        
         aMap.setMyLocationStyle(myLocationStyle);
         aMap.setOnMyLocationChangeListener(this);
-        aMap.moveCamera(CameraUpdateFactory.zoomTo(16));
+        aMap.moveCamera(CameraUpdateFactory.zoomTo(18));
         mRouteSearch = new RouteSearch(this);
         mRouteSearch.setRouteSearchListener(this);
     }
@@ -188,8 +196,10 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         Log.e("TAG", "onResume");
         super.onDestroy();
         mAMapNaviView.onDestroy();
-        mAMapNavi.stopNavi();
-        mAMapNavi.destroy();
+        if (mAMapNavi != null) {
+            mAMapNavi.stopNavi();
+            mAMapNavi.destroy();
+        }
         mMapView.onDestroy();
     }
 
@@ -329,8 +339,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     //算路成功后执行的
     @Override
     public void onCalculateRouteSuccess(int[] ints) {
-            Log.e(TAG,"GPS");
-            mAMapNavi.startNavi(NaviType.GPS);
+        Log.e(TAG, "GPS");
+        mAMapNavi.startNavi(NaviType.GPS);
     }
 
     @Override
@@ -414,8 +424,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
 
-
-
     @Override
     public void showProgress() {
 
@@ -444,9 +452,9 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void onSuggestionClicked(SearchSuggestion searchSuggestion) {
-           SearchSuggestionItem item = (SearchSuggestionItem) searchSuggestion;
-           Log.i(TAG,item.getSuggestoin());
-           Log.i(TAG,item.getLatLonPoint().getLatitude()+""+item.getLatLonPoint().getLongitude()+"");
+        SearchSuggestionItem item = (SearchSuggestionItem) searchSuggestion;
+        LatLonPoint latLonPoint = item.getLatLonPoint();
+        presenter.getNearGarage(latLonPoint.getLongitude(), latLonPoint.getLatitude(), 2);
     }
 
     @Override
@@ -461,8 +469,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     public void onGetInputtips(List<Tip> list, int i) {
         List<SearchSuggestionItem> suggestionItems = new ArrayList<>();
         for (Tip tip : list) {
-            suggestionItems.add(new SearchSuggestionItem(tip.getName(),tip.getPoint()));
-            
+            suggestionItems.add(new SearchSuggestionItem(tip.getName(), tip.getPoint()));
+
         }
         mSearchView.swapSuggestions(suggestionItems);
     }
@@ -475,7 +483,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
      */
     @Override
     public void onRegeocodeSearched(RegeocodeResult regeocodeResult, int i) {
-        
+
     }
 
     /**
@@ -486,33 +494,36 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
      */
     @Override
     public void onGeocodeSearched(GeocodeResult geocodeResult, int i) {
-      if (i == 1000){
-          //请求成功,得到经纬度
-          LatLonPoint latLonPoint = geocodeResult.getGeocodeAddressList().get(0).getLatLonPoint();
-          Log.i(TAG,latLonPoint.getLatitude()+" "+latLonPoint.getLongitude()+"");
-          Log.e(TAG,"开始搜索车库");
-          presenter.getNearGarage(latLonPoint.getLongitude(),latLonPoint.getLatitude(),2);
-          //发起请求
-      }
+        if (i == 1000) {
+            //请求成功,得到经纬度
+            LatLonPoint latLonPoint = geocodeResult.getGeocodeAddressList().get(0).getLatLonPoint();
+            Log.i(TAG, latLonPoint.getLatitude() + " " + latLonPoint.getLongitude() + "");
+            Log.e(TAG, "开始搜索车库");
+            presenter.getNearGarage(latLonPoint.getLongitude(), latLonPoint.getLatitude(), 2);
+            //发起请求
+        }
     }
+
     boolean isSimulate = false;
 
 
-    public void getRealItem(double lon,double lat){
-        LatLonPoint mEndPoint = new LatLonPoint(lat,lon);
+    public void getRealItem(double lon, double lat) {
+        LatLonPoint mEndPoint = new LatLonPoint(lat, lon);
         RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(
-                new LatLonPoint(myLatitude,myLongitude), mEndPoint);
-        RouteSearch.DriveRouteQuery query = new RouteSearch.DriveRouteQuery(fromAndTo,RouteSearch.DrivingDefault, null,
+                new LatLonPoint(myLatitude, myLongitude), mEndPoint);
+        RouteSearch.DriveRouteQuery query = new RouteSearch.DriveRouteQuery(fromAndTo, RouteSearch.DrivingDefault, null,
                 null, "");// 第一个参数表示路径规划的起点和终点，第二个参数表示驾车模式，第三个参数表示途经点，第四个参数表示避让区域，第五个参数表示避让道路
         mRouteSearch.calculateDriveRouteAsyn(query);// 异步路径规划驾车模式查询
     }
+
     HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager;
     GarageBean bean;
+
     @Override
     public void showGarage(GarageBean garageBean) {
         bean = garageBean;
         horizontalInfiniteCycleViewPager = (HorizontalInfiniteCycleViewPager) findViewById(R.id.hicvp);
-        MainAdapter adapter = new MainAdapter(this,garageBean);
+        MainAdapter adapter = new MainAdapter(this, garageBean);
         horizontalInfiniteCycleViewPager.setAdapter(adapter);
     }
 
@@ -523,9 +534,9 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void onDriveRouteSearched(DriveRouteResult result, int i) {
-        if(i == AMapException.CODE_AMAP_SUCCESS){
-            if(result!=null&&result.getPaths()!=null){
-                if(result.getPaths().size()>0){
+        if (i == AMapException.CODE_AMAP_SUCCESS) {
+            if (result != null && result.getPaths() != null) {
+                if (result.getPaths().size() > 0) {
                     mDriveRouteResult = result;
                     DrivePath drivePath = mDriveRouteResult.getPaths()
                             .get(0);
