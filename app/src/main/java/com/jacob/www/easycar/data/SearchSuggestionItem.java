@@ -3,7 +3,6 @@ package com.jacob.www.easycar.data;
 import android.annotation.SuppressLint;
 import android.os.Parcel;
 
-import com.amap.api.services.core.LatLonPoint;
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 
 /**
@@ -14,20 +13,16 @@ import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 public class SearchSuggestionItem implements SearchSuggestion {
 
     String suggestoin;
-    LatLonPoint latLonPoint;
+    //    LatLonPoint latLonPoint;
 
-    public SearchSuggestionItem(String suggestoin, LatLonPoint latLonPoint) {
+    public SearchSuggestionItem(String suggestoin) {
         this.suggestoin = suggestoin;
-        this.latLonPoint = latLonPoint;
     }
 
     public String getSuggestoin() {
         return suggestoin;
     }
-
-    public LatLonPoint getLatLonPoint() {
-        return latLonPoint;
-    }
+    
 
     @Override
     public String getBody() {

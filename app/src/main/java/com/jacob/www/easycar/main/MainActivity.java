@@ -1,6 +1,7 @@
 package com.jacob.www.easycar.main;
 
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -117,23 +118,25 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         mAMapNaviView.onCreate(savedInstanceState);
         mMapView = (MapView) findViewById(R.id.map);
         mMapView.onCreate(savedInstanceState);
-        
+
         if (aMap == null) {
             aMap = mMapView.getMap();
         }
         aMap.getUiSettings().setMyLocationButtonEnabled(false);
         aMap.getUiSettings().setZoomControlsEnabled(false);
         aMap.getUiSettings().setZoomGesturesEnabled(true);
-        
-    
+
+
         myLocationStyle = new MyLocationStyle();
         myLocationStyle.interval(1000);
         myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);
         myLocationStyle.strokeColor(R.color.colorPrimary);
-        myLocationStyle.radiusFillColor(getColor(R.color.touming));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            myLocationStyle.radiusFillColor(getColor(R.color.touming));
+        }
         myLocationStyle.strokeWidth(5);
         aMap.setMyLocationEnabled(true);
-        
+
         aMap.setMyLocationStyle(myLocationStyle);
         aMap.setOnMyLocationChangeListener(this);
         aMap.moveCamera(CameraUpdateFactory.zoomTo(18));
@@ -453,8 +456,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     @Override
     public void onSuggestionClicked(SearchSuggestion searchSuggestion) {
         SearchSuggestionItem item = (SearchSuggestionItem) searchSuggestion;
-        LatLonPoint latLonPoint = item.getLatLonPoint();
-        presenter.getNearGarage(latLonPoint.getLongitude(), latLonPoint.getLatitude(), 2);
+        GeocodeQuery query = new GeocodeQuery(item.getBody(), currentCity);
+        geocodeSearch.getFromLocationNameAsyn(query);
     }
 
     @Override
@@ -469,8 +472,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     public void onGetInputtips(List<Tip> list, int i) {
         List<SearchSuggestionItem> suggestionItems = new ArrayList<>();
         for (Tip tip : list) {
-            suggestionItems.add(new SearchSuggestionItem(tip.getName(), tip.getPoint()));
-
+            suggestionItems.add(new SearchSuggestionItem(tip.getName()));
         }
         mSearchView.swapSuggestions(suggestionItems);
     }
