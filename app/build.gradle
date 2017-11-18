@@ -55,5 +55,6 @@ dependencies {
     compile 'com.amap.api:search:latest.integration'
     compile files('libs/jsms_android-1.2.0.jar')
     compile 'com.github.devlight:infinitecycleviewpager:1.0.2'
-
+    compile files('libs/MobCommons-2017.0607.1736.jar')
+    compile name:'SMSSDK-3.0.0',ext:'aar'
 }

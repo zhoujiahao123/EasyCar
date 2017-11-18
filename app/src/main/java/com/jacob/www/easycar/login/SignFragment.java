@@ -1,5 +1,6 @@
 package com.jacob.www.easycar.login;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -8,12 +9,13 @@ import com.jacob.www.easycar.R;
 import com.jacob.www.easycar.base.BaseFragment;
 import com.jacob.www.easycar.util.RxBus;
 import com.jacob.www.easycar.widget.VerifyButton;
+import com.mob.MobSDK;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import cn.jpush.sms.SMSSDK;
-import cn.jpush.sms.listener.SmscheckListener;
-import cn.jpush.sms.listener.SmscodeListener;
+import cn.smssdk.EventHandler;
+import cn.smssdk.OnSendMessageHandler;
+import cn.smssdk.SMSSDK;
 
 /**
  * Created by 张兴锐 on 2017/11/15.
@@ -41,11 +43,16 @@ public class SignFragment extends BaseFragment implements LogInContract.View {
 
     }
 
-
+    private String countryCode ;
+    private static final String code = "42";
+    EventHandler eh;
     @Override
     public void init() {
         presenter = new LogInPresenter(this);
-        SMSSDK.getInstance().setIntervalTime(60 * 1000);//设置前后获取验证码的时间间隔,这里设置60秒
+        MobSDK.init(getContext().getApplicationContext(),"2275146daf5e5","018a726083da6b9b83aa8d05a0971c50");
+        eh = InitSDK();
+        SMSSDK.registerEventHandler(eh); //注册短信回调
+        countryCode = SMSSDK.getCountry(code)[1];
     }
 
     String phoneNum;
@@ -54,17 +61,13 @@ public class SignFragment extends BaseFragment implements LogInContract.View {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.send_verification:
+                Log.e(TAG,"发送验证码");
                 phoneNum = usernameInput.getText().toString();
-                Log.e("TAG", "send_verification" + phoneNum);
-                SMSSDK.getInstance().getSmsCodeAsyn(phoneNum, "1", new SmscodeListener() {
+                SMSSDK.getVerificationCode(countryCode,phoneNum,new OnSendMessageHandler() {
                     @Override
-                    public void getCodeSuccess(String s) {
-                        Log.e("TAG", "获取验证码成功");
-                    }
-
-                    @Override
-                    public void getCodeFail(int i, String s) {
-                        Log.e("TAG", i + "获取验证码失败" + s);
+                    public boolean onSendMessage(String s, String s1) {
+                        Log.e(TAG,"onSendMessage");
+                        return false;
                     }
                 });
                 break;
@@ -75,24 +78,34 @@ public class SignFragment extends BaseFragment implements LogInContract.View {
                     showMsg("您的输入不合法");
                     return;
                 }
-                SMSSDK.getInstance().checkSmsCodeAsyn(phoneNum, verifyCodeInput.getText().toString(), new SmscheckListener() {
-                    @Override
-                    public void checkCodeSuccess(String s) {
-                        presenter.signIn(usernameInput.getText().toString(), passwordInput.getText().toString());
-                    }
-
-                    @Override
-                    public void checkCodeFail(int i, String s) {
-                        Log.e("TAG", "验证码验证失败");
-                    }
-                });
+               SMSSDK.submitVerificationCode(SMSSDK.getCountry("42")[1],phoneNum,verifyCodeInput.getText().toString());
                 break;
             case R.id.already_have:
                 RxBus.getDefault().post(new Integer(0));
                 break;
         }
     }
-
+    @NonNull
+    private EventHandler InitSDK() {
+        return new EventHandler(){
+            @Override
+            public void afterEvent(int event, int result, Object data) {
+                if (result == SMSSDK.RESULT_COMPLETE) {
+                    Log.e("回调完成","回调完成");
+                    if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
+                        Log.e("提交验证码成","成功");
+                        presenter.logIn(phoneNum,passwordInput.getText().toString());
+                    }else if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE){
+                        Log.e("获取验证码成功","成功");
+                    }else if (event == SMSSDK.EVENT_GET_SUPPORTED_COUNTRIES){
+                        //返回支持发送验证码的国家列表
+                    }
+                }else{
+                    Log.e(TAG,"回调失败"+data.toString()+" "+event+" "+result);
+                }
+            }
+        };
+    }
 
     @Override
     public void success() {
@@ -102,4 +115,9 @@ public class SignFragment extends BaseFragment implements LogInContract.View {
         RxBus.getDefault().post(new Integer(0));
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        SMSSDK.unregisterEventHandler(eh); //注册短信回调
+    }
 }

@@ -49,7 +49,7 @@ public class MainAdapter extends PagerAdapter {
         tvTotalLot = view.findViewById(R.id.tv_des_total);
         tvName = view.findViewById(R.id.tv_des_name);
         btnNavi = view.findViewById(R.id.btn_start_navi);
-        activity.getRealItem();
+        activity.getRealItem(bean.getData().get(0).getPositionLongitude(),bean.getData().get(0).getPositionLatitude());
         btnNavi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

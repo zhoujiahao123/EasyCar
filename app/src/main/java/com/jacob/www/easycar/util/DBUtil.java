@@ -1,6 +1,5 @@
-package com.jacob.www.easycar.base;
+package com.jacob.www.easycar.util;
 
-import android.app.Application;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -11,25 +10,16 @@ import com.zxr.medicalaid.DaoSession;
  * Created by ASUS-NB on 2017/11/18.
  */
 
-public class App extends Application{
-    public static Context context;
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        context = this;
-    }
+public class DBUtil {
     static DaoSession daoSession;
     static DaoMaster daoMaster;
     static DaoMaster.DevOpenHelper helper;
     static SQLiteDatabase database ;
-    public static DaoSession getDaoSession(){
+    public static DaoSession getDaoSession(Context context){
         helper = new DaoMaster.DevOpenHelper(context,"EasyCar-DB",null);
         database = helper.getWritableDatabase();
         daoMaster = new DaoMaster(database);
         daoSession  = daoMaster.newSession();
         return daoSession;
-    }
-    public static Context getAppContext(){
-        return context;
     }
 }

@@ -28,6 +28,7 @@ import com.amap.api.navi.model.AimLessModeCongestionInfo;
 import com.amap.api.navi.model.AimLessModeStat;
 import com.amap.api.navi.model.NaviInfo;
 import com.amap.api.navi.model.NaviLatLng;
+import com.amap.api.services.core.AMapException;
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.geocoder.GeocodeQuery;
 import com.amap.api.services.geocoder.GeocodeResult;
@@ -36,6 +37,12 @@ import com.amap.api.services.geocoder.RegeocodeResult;
 import com.amap.api.services.help.Inputtips;
 import com.amap.api.services.help.InputtipsQuery;
 import com.amap.api.services.help.Tip;
+import com.amap.api.services.route.BusRouteResult;
+import com.amap.api.services.route.DrivePath;
+import com.amap.api.services.route.DriveRouteResult;
+import com.amap.api.services.route.RideRouteResult;
+import com.amap.api.services.route.RouteSearch;
+import com.amap.api.services.route.WalkRouteResult;
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 import com.autonavi.tbt.TrafficFacilityInfo;
@@ -44,15 +51,15 @@ import com.jacob.www.easycar.R;
 import com.jacob.www.easycar.base.App;
 import com.jacob.www.easycar.data.GarageBean;
 import com.jacob.www.easycar.data.SearchSuggestionItem;
+import com.jacob.www.easycar.overlay.DrivingRouteOverlay;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
-public class MainActivity extends AppCompatActivity implements MainContract.View, AMapNaviListener, AMapNaviViewListener, AMap.OnMyLocationChangeListener, FloatingSearchView.OnQueryChangeListener, FloatingSearchView.OnSearchListener, Inputtips.InputtipsListener, GeocodeSearch.OnGeocodeSearchListener {
+public class MainActivity extends AppCompatActivity implements MainContract.View, AMapNaviListener, AMapNaviViewListener, AMap.OnMyLocationChangeListener, FloatingSearchView.OnQueryChangeListener, FloatingSearchView.OnSearchListener, Inputtips.InputtipsListener, GeocodeSearch.OnGeocodeSearchListener,RouteSearch.OnRouteSearchListener {
     private String TAG = "MainActivity";
     AMapNavi mAMapNavi;
     MainContract.Presenter presenter;
@@ -81,8 +88,9 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     double myLongitude = 0, myLatitude = 0;
     @BindView(R.id.floating_search_view)
     FloatingSearchView mSearchView;
-
-
+    //路径规划
+    private RouteSearch mRouteSearch;
+    private DriveRouteResult mDriveRouteResult;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,15 +129,14 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         aMap.setMyLocationStyle(myLocationStyle);
         aMap.setOnMyLocationChangeListener(this);
         aMap.moveCamera(CameraUpdateFactory.zoomTo(16));
-
+        mRouteSearch = new RouteSearch(this);
+        mRouteSearch.setRouteSearchListener(this);
     }
 
     /**
      * 开始导航,根据经纬度
      */
     public void startNavi(double latitude, double longitude) {
-        isSimulate = false;
-        mAMapNavi.stopNavi();
         double myLatitude = this.myLatitude;
         double myLongitude = this.myLongitude;
         Log.e("TAG", "收到的经纬度" + latitude + " " + longitude);
@@ -322,16 +329,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     //算路成功后执行的
     @Override
     public void onCalculateRouteSuccess(int[] ints) {
-
-        if(!isSimulate){
             Log.e(TAG,"GPS");
             mAMapNavi.startNavi(NaviType.GPS);
-        }
-        else{
-            Log.e(TAG,"EMULATOR");
-            mAMapNavi.startNavi(NaviType.EMULATOR);
-        }
-
     }
 
     @Override
@@ -497,25 +496,15 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
       }
     }
     boolean isSimulate = false;
-    public void getRealItem(){
-        isSimulate = true;
-        int pos=horizontalInfiniteCycleViewPager.getRealItem();
-        double lat = bean.getData().get(pos).getPositionLatitude();
-        double lon = bean.getData().get(pos).getPositionLongitude();
-        sList.clear();
-        eList.clear();
-        sList.add(new NaviLatLng(myLatitude,myLongitude));
-        eList.add(new NaviLatLng(lat,lon));
-        mAMapNavi = AMapNavi.getInstance(App.getAppContext());
-        mAMapNaviView.setVisibility(View.VISIBLE);
-        mMapView.setVisibility(View.INVISIBLE);
-        //添加监听回调，用于处理算路成功
-        mAMapNavi.addAMapNaviListener(this);
-        mAMapNaviView.setAMapNaviViewListener(this);
-        AMapNaviViewOptions options = mAMapNaviView.getViewOptions();
-        options.setLayoutVisible(false);
-        mAMapNaviView.setViewOptions(options);
-        onInitNaviSuccess();
+
+
+    public void getRealItem(double lon,double lat){
+        LatLonPoint mEndPoint = new LatLonPoint(lat,lon);
+        RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(
+                new LatLonPoint(myLatitude,myLongitude), mEndPoint);
+        RouteSearch.DriveRouteQuery query = new RouteSearch.DriveRouteQuery(fromAndTo,RouteSearch.DrivingDefault, null,
+                null, "");// 第一个参数表示路径规划的起点和终点，第二个参数表示驾车模式，第三个参数表示途经点，第四个参数表示避让区域，第五个参数表示避让道路
+        mRouteSearch.calculateDriveRouteAsyn(query);// 异步路径规划驾车模式查询
     }
     HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager;
     GarageBean bean;
@@ -525,5 +514,42 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         horizontalInfiniteCycleViewPager = (HorizontalInfiniteCycleViewPager) findViewById(R.id.hicvp);
         MainAdapter adapter = new MainAdapter(this,garageBean);
         horizontalInfiniteCycleViewPager.setAdapter(adapter);
+    }
+
+    @Override
+    public void onBusRouteSearched(BusRouteResult busRouteResult, int i) {
+
+    }
+
+    @Override
+    public void onDriveRouteSearched(DriveRouteResult result, int i) {
+        if(i == AMapException.CODE_AMAP_SUCCESS){
+            if(result!=null&&result.getPaths()!=null){
+                if(result.getPaths().size()>0){
+                    mDriveRouteResult = result;
+                    DrivePath drivePath = mDriveRouteResult.getPaths()
+                            .get(0);
+                    DrivingRouteOverlay drivingRouteOverlay = new DrivingRouteOverlay(
+                            this, aMap, drivePath,
+                            mDriveRouteResult.getStartPos(),
+                            mDriveRouteResult.getTargetPos(), null);
+                    drivingRouteOverlay.setNodeIconVisibility(false);//设置节点marker是否显示
+                    drivingRouteOverlay.setIsColorfulline(true);//是否用颜色展示交通拥堵情况，默认true
+                    drivingRouteOverlay.removeFromMap();
+                    drivingRouteOverlay.addToMap();
+                    drivingRouteOverlay.zoomToSpan();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onWalkRouteSearched(WalkRouteResult walkRouteResult, int i) {
+
+    }
+
+    @Override
+    public void onRideRouteSearched(RideRouteResult rideRouteResult, int i) {
+
     }
 }
