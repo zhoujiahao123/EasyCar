@@ -58,6 +58,7 @@ public class LogInPresenter implements LogInContract.Presenter {
             @Override
             public void loaded(UserBean userBean) {
                 view.hideProgress();
+                view.showMsg(App.getAppContext().getString(R.string.sign_in_success));
                 view.success();
             }
 

@@ -1,16 +1,21 @@
 package com.jacob.www.easycar.main;
 
+import android.content.DialogInterface;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.MapView;
+import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.AMapNaviListener;
@@ -47,20 +52,37 @@ import com.amap.api.services.route.WalkRouteResult;
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 import com.autonavi.tbt.TrafficFacilityInfo;
+import com.bumptech.glide.Glide;
 import com.gigamole.infinitecycleviewpager.HorizontalInfiniteCycleViewPager;
 import com.jacob.www.easycar.R;
 import com.jacob.www.easycar.base.App;
 import com.jacob.www.easycar.data.GarageBean;
 import com.jacob.www.easycar.data.SearchSuggestionItem;
+import com.jacob.www.easycar.login.LogInActivity;
+import com.jacob.www.easycar.net.ResponseCons;
 import com.jacob.www.easycar.overlay.DrivingRouteOverlay;
+import com.jacob.www.easycar.util.SpUtil;
+import com.jacob.www.easycar.util.ToActivityUtil;
+import com.jacob.www.easycar.widget.CircleImageView;
+import com.zxr.medicalaid.User;
+import com.zxr.medicalaid.UserDao;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity implements MainContract.View, AMapNaviListener, AMapNaviViewListener, AMap.OnMyLocationChangeListener, FloatingSearchView.OnQueryChangeListener, FloatingSearchView.OnSearchListener, Inputtips.InputtipsListener, GeocodeSearch.OnGeocodeSearchListener, RouteSearch.OnRouteSearchListener {
+    @BindView(R.id.person_image)
+    CircleImageView personImage;
+    @BindView(R.id.phone_num)
+    TextView phoneNum;
+    @BindView(R.id.car_num)
+    TextView carNum;
+    @BindView(R.id.userName)
+    TextView userName;
     private String TAG = "MainActivity";
     AMapNavi mAMapNavi;
     MainContract.Presenter presenter;
@@ -92,6 +114,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     //路径规划
     private RouteSearch mRouteSearch;
     private DriveRouteResult mDriveRouteResult;
+    private float nowZoom = 18f;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
         myLocationStyle = new MyLocationStyle();
         myLocationStyle.interval(1000);
-        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);
+        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATE);
         myLocationStyle.strokeColor(R.color.colorPrimary);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             myLocationStyle.radiusFillColor(getColor(R.color.touming));
@@ -139,9 +163,17 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
         aMap.setMyLocationStyle(myLocationStyle);
         aMap.setOnMyLocationChangeListener(this);
-        aMap.moveCamera(CameraUpdateFactory.zoomTo(18));
+        aMap.moveCamera(CameraUpdateFactory.zoomTo(nowZoom));
         mRouteSearch = new RouteSearch(this);
         mRouteSearch.setRouteSearchListener(this);
+
+        //用戶信息
+        UserDao userDao = App.getDaoSession().getUserDao();
+        User user = userDao.loadAll().get(0);
+        userName.setText(user.getUserName());
+        phoneNum.setText("" + user.getPhoneNum());
+        carNum.setText("渝C00000");
+        Glide.with(this).load(ResponseCons.BASE_URL + user.getIcon()).into(personImage);
     }
 
     /**
@@ -175,7 +207,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         myLatitude = location.getLatitude();
         myLongitude = location.getLongitude();
         currentCity = location.getProvider();
-
     }
 
 
@@ -564,5 +595,56 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     @Override
     public void onRideRouteSearched(RideRouteResult rideRouteResult, int i) {
 
+    }
+
+    @OnClick({R.id.location, R.id.person_age, R.id.neighbor_garage, R.id.log_off})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.location:
+                if (myLatitude != 0) {
+                    aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(myLatitude, myLongitude), nowZoom));
+                }
+                break;
+            case R.id.person_age:
+                changBottomSheet(0);
+                break;
+            case R.id.neighbor_garage:
+                changBottomSheet(1);
+                presenter.getNearGarage(myLongitude, myLatitude, 2);
+                break;
+            case R.id.log_off:
+                new AlertDialog.Builder(this)
+                        .setTitle("提示")
+                        .setMessage("您确定要退出吗")
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                                SpUtil.putBoolean(MainActivity.this, "has_login", false);
+                                App.getDaoSession().getUserDao().deleteAll();
+                                ToActivityUtil.toNextActivityAndFinish(MainActivity.this, LogInActivity.class);
+                            }
+                        })
+                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        }).show();
+                break;
+            default:
+                break;
+
+        }
+
+    }
+
+    private void changBottomSheet(int i) {
+        BottomSheetBehavior behavior = BottomSheetBehavior.from(findViewById(R.id.person_age_bottom_sheet));
+        if (behavior.getState() == BottomSheetBehavior.STATE_COLLAPSED && i == 0) {
+            behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        } else if (behavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+            behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
     }
 }

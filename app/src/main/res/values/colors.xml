@@ -10,4 +10,8 @@
     <color name="nobel">#A0A0A0</color>
     <color name="black">#000000</color>
     <color name="touming">#00000000</color>
+    
+    <color name="green">#4CAF50</color>
+    <color name="red">#F44336</color>
+    <color name="yellow">#FFEB3B</color>
 </resources>

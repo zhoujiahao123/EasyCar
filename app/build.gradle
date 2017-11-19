@@ -57,4 +57,8 @@ dependencies {
     compile 'com.github.devlight:infinitecycleviewpager:1.0.2'
     compile files('libs/MobCommons-2017.0607.1736.jar')
     compile name:'SMSSDK-3.0.0',ext:'aar'
+    compile 'com.github.bumptech.glide:glide:3.6.1'
+
+    compile('com.github.hotchemi:permissionsdispatcher:2.4.0') { exclude module: 'support-v13' }
+    annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:2.4.0'
 }

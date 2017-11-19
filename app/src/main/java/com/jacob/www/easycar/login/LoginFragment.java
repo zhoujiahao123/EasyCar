@@ -1,5 +1,7 @@
 package com.jacob.www.easycar.login;
 
+import android.Manifest;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.EditText;
 
@@ -12,11 +14,14 @@ import com.jacob.www.easycar.util.ToActivityUtil;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.RuntimePermissions;
 
 /**
  * Created by 张兴锐 on 2017/11/15.
  */
 
+@RuntimePermissions
 public class LoginFragment extends BaseFragment implements LogInContract.View {
 
     LogInContract.Presenter presenter;
@@ -38,6 +43,7 @@ public class LoginFragment extends BaseFragment implements LogInContract.View {
     @Override
     public void init() {
         presenter = new LogInPresenter(this);
+        getPermissions();
     }
 
 
@@ -64,5 +70,21 @@ public class LoginFragment extends BaseFragment implements LogInContract.View {
     public void success() {
         SpUtil.putBoolean(getContext(), "has_login", true);
         ToActivityUtil.toNextActivityAndFinish(getContext(), MainActivity.class);
+    }
+
+    
+    private void getPermissions(){
+        LoginFragmentPermissionsDispatcher.locationNeedsWithCheck(this);
+    }
+
+    @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+    void locationNeeds() {
+        
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        LoginFragmentPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
     }
 }
