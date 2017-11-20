@@ -29,4 +29,5 @@
         <item name="android:padding">@dimen/margin_normal</item>
         <item name="android:textColor">@color/dark_gray</item>
     </style>
+  
 </resources>

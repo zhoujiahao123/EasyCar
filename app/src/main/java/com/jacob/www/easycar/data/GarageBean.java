@@ -3,7 +3,9 @@ package com.jacob.www.easycar.data;
 import java.util.List;
 
 /**
- * Created by ASUS-NB on 2017/11/17.
+ *
+ * @author ASUS-NB
+ * @date 2017/11/17
  */
 
 public class GarageBean {

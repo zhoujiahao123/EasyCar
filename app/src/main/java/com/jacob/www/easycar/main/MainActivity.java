@@ -7,8 +7,12 @@ import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,9 +65,11 @@ import com.jacob.www.easycar.data.SearchSuggestionItem;
 import com.jacob.www.easycar.login.LogInActivity;
 import com.jacob.www.easycar.net.ResponseCons;
 import com.jacob.www.easycar.overlay.DrivingRouteOverlay;
+import com.jacob.www.easycar.util.DisplayUtil;
 import com.jacob.www.easycar.util.SpUtil;
 import com.jacob.www.easycar.util.ToActivityUtil;
 import com.jacob.www.easycar.widget.CircleImageView;
+import com.jacob.www.easycar.widget.GarageImage;
 import com.zxr.medicalaid.User;
 import com.zxr.medicalaid.UserDao;
 
@@ -89,18 +95,29 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     private String TAG = "MainActivity";
     AMapNavi mAMapNavi;
     MainContract.Presenter presenter;
-    //起始点经纬度
+    /**
+     * 起始点经纬度
+     */
     protected List<NaviLatLng> sList = new ArrayList<NaviLatLng>();
-    //终点经纬度
+    /**
+     * 终点经纬度
+     */
     protected List<NaviLatLng> eList = new ArrayList<NaviLatLng>();
-    //途中经过的点的经纬度，一般都没用上
+    /**
+     * 途中经过的点的经纬度，一般都没用上
+     */
     protected List<NaviLatLng> mWayPointList = new ArrayList<NaviLatLng>();
-    //获取 AMapNaviView 实例
+    /**
+     * 获取 AMapNaviView 实例
+     */
     AMapNaviView mAMapNaviView;
     //地图对象
     MapView mMapView = null;
     AMap aMap;
-    //定位的style
+    /**
+     * 定位的style
+     */
+
     MyLocationStyle myLocationStyle;
     String currentCity;
     /**
@@ -109,7 +126,9 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     GeocodeSearch geocodeSearch;
     InputtipsQuery query;
     Inputtips inputTips;
-    //目前我所在位置的经纬度
+    /**
+     * 目前我所在位置的经纬度
+     */
     double myLongitude = 0, myLatitude = 0;
     @BindView(R.id.floating_search_view)
     FloatingSearchView mSearchView;
@@ -603,7 +622,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
 
-
     @Override
     public void onBusRouteSearched(BusRouteResult busRouteResult, int i) {
 
@@ -622,8 +640,10 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                             this, aMap, drivePath,
                             mDriveRouteResult.getStartPos(),
                             mDriveRouteResult.getTargetPos(), null);
-                    drivingRouteOverlay.setNodeIconVisibility(false);//设置节点marker是否显示
-                    drivingRouteOverlay.setIsColorfulline(true);//是否用颜色展示交通拥堵情况，默认true
+                    //设置节点marker是否显示
+                    drivingRouteOverlay.setNodeIconVisibility(false);
+                    //是否用颜色展示交通拥堵情况，默认true
+                    drivingRouteOverlay.setIsColorfulline(true);
                     drivingRouteOverlay.removeFromMap();
                     drivingRouteOverlay.addToMap();
                     drivingRouteOverlay.zoomToSpan();
@@ -642,7 +662,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     }
 
-    @OnClick({R.id.location, R.id.person_age, R.id.neighbor_garage, R.id.log_off})
+    @OnClick({R.id.location, R.id.person_age, R.id.neighbor_garage, R.id.log_off, R.id.garage_info})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.location:
@@ -677,6 +697,10 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                             }
                         }).show();
                 break;
+            case R.id.garage_info:
+                //得到二进制序列
+                presenter.getGarageLot(gId);
+                break;
             default:
                 break;
 
@@ -693,20 +717,51 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         }
     }
 
-    @OnClick(R.id.garage_info)
-    public void onClick() {
-        //得到二进制序列
-        presenter.getGarageLot(gId);
-    }
+
     private String gId;
-    //用来设置当前的车库的id
-    public void setGarageId(String gId){
+
+    /**
+     * 用来设置当前的车库的id
+     */
+    public void setGarageId(String gId) {
         this.gId = gId;
-        Log.e(TAG,gId+"是gid");
+        Log.e(TAG, gId + "是gid");
     }
+
     //展示车位
+
     @Override
     public void showLot(String lot) {
-        Log.e(TAG,lot);
+        LinearLayout dialogLinear = new LinearLayout(this);
+        dialogLinear.setOrientation(LinearLayout.HORIZONTAL);
+        dialogLinear.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        dialogLinear.setGravity(Gravity.CENTER);
+        DisplayMetrics dm = this.getResources().getDisplayMetrics();
+        LinearLayout.LayoutParams chidLp = new LinearLayout.LayoutParams(DisplayUtil.dip2px(60, dm.density), DisplayUtil.dip2px(60, dm.density));
+        chidLp.setMargins(DisplayUtil.dip2px(8, dm.density), DisplayUtil.dip2px(8, dm.density), DisplayUtil.dip2px(8, dm.density), DisplayUtil.dip2px(8, dm.density));
+
+        for (int i = 0; i < lot.length(); i++) {
+            GarageImage garageImage = new GarageImage(this);
+            garageImage.setLayoutParams(chidLp);
+            garageImage.setText(i + 1 + "");
+            garageImage.setTextSize(DisplayUtil.sp2px(18, dm.scaledDensity));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                garageImage.setFillColor(lot.toCharArray()[i] == '0' ? getColor(R.color.red) : getColor(R.color.green));
+                garageImage.setWordColor(getColor(R.color.white));
+            }
+            dialogLinear.addView(garageImage);
+        }
+        new AlertDialog.Builder(this)
+                .setTitle("当前车库信息")
+                .setView(dialogLinear)
+                .setCancelable(true)
+                .setPositiveButton("好的", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .show();
     }
+
 }

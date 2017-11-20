@@ -19,7 +19,9 @@ import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
- * Created by ASUS-NB on 2017/11/12.
+ *
+ * @author ASUS-NB
+ * @date 2017/11/12
  */
 
 public class BaseModelImpl {

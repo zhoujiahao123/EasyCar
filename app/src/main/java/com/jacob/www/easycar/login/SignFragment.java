@@ -76,7 +76,7 @@ public class SignFragment extends BaseFragment implements LogInContract.View {
             case R.id.login_bt:
                 String phoneNum = usernameInput.getText().toString();
                 String passWord = passwordInput.getText().toString();
-                if (phoneNum.equals("") || passWord.equals("")) {
+                if ("".equals(phoneNum) || "".equals(passWord)) {
                     showMsg("您的输入不合法");
                     return;
                 }
@@ -84,6 +84,8 @@ public class SignFragment extends BaseFragment implements LogInContract.View {
                 break;
             case R.id.already_have:
                 RxBus.getDefault().post(new Integer(0));
+                break;
+            default:
                 break;
         }
     }
@@ -133,6 +135,7 @@ public class SignFragment extends BaseFragment implements LogInContract.View {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        SMSSDK.unregisterEventHandler(eh); //注册短信回调
+        //注册短信回调
+        SMSSDK.unregisterEventHandler(eh);
     }
 }
