@@ -18,7 +18,9 @@ import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
 /**
- * Created by 张兴锐 on 2017/11/15.
+ *
+ * @author 张兴锐
+ * @date 2017/11/15
  */
 
 @RuntimePermissions

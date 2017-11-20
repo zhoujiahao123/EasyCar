@@ -74,6 +74,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+/**
+ * @author 周家豪
+ */
 public class MainActivity extends AppCompatActivity implements MainContract.View, AMapNaviListener, AMapNaviViewListener, AMap.OnMyLocationChangeListener, FloatingSearchView.OnQueryChangeListener, FloatingSearchView.OnSearchListener, Inputtips.InputtipsListener, GeocodeSearch.OnGeocodeSearchListener, RouteSearch.OnRouteSearchListener {
     @BindView(R.id.person_image)
     CircleImageView personImage;
@@ -226,6 +229,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         mMapView.onPause();
     }
 
+    @Override
     protected void onDestroy() {
         Log.e("TAG", "onResume");
         super.onDestroy();
@@ -244,22 +248,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void onInitNaviSuccess() {
-        /**
-         * 方法:
-         *   int strategy=mAMapNavi.strategyConvert(congestion, avoidhightspeed, cost, hightspeed, multipleroute);
-         * 参数:
-         * @congestion 躲避拥堵
-         * @avoidhightspeed 不走高速
-         * @cost 避免收费
-         * @hightspeed 高速优先
-         * @multipleroute 多路径
-         *
-         * 说明:
-         *      以上参数都是boolean类型，其中multipleroute参数表示是否多条路线，如果为true则此策略会算出多条路线。
-         * 注意:
-         *      不走高速与高速优先不能同时为true
-         *      高速优先与避免收费不能同时为true
-         */
         Log.e("TAG", "算路成功");
         int strategy = 0;
         try {
@@ -475,7 +463,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void onSearchTextChanged(String oldQuery, String newQuery) {
-        if (!newQuery.equals("")) {
+        if (!"".equals(newQuery)) {
             Log.i(TAG, "oldQuery" + oldQuery + " " + "new" + newQuery);
             query = new InputtipsQuery(newQuery, currentCity);
             inputTips.setQuery(query);
