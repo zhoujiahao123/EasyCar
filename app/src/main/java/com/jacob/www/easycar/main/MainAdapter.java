@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.amap.api.navi.model.NaviInfo;
 import com.jacob.www.easycar.R;
 import com.jacob.www.easycar.data.GarageBean;
 
@@ -22,11 +23,13 @@ public class MainAdapter extends PagerAdapter {
     private GarageBean bean;
 
     private TextView tvFreeLot,tvTotalLot,tvDesTime,tvDesKm,tvName;
+
     private Button btnNavi;
     public MainAdapter(Context context, GarageBean bean) {
         activity = (MainActivity) context;
         mLayoutInflater = LayoutInflater.from(context);
         this.bean = bean;
+
     }
 
     @Override
@@ -54,6 +57,7 @@ public class MainAdapter extends PagerAdapter {
             @Override
             public void onClick(View view) {
                 activity.startNavi(bean.getData().get(position).getPositionLatitude(),bean.getData().get(position).getPositionLongitude());
+                activity.setGarageId(bean.getData().get(position).getGarageId());
             }
         });
         tvName.setText(bean.getData().get(position).getGarageName());

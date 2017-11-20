@@ -86,7 +86,16 @@
                     android:layout_height="@dimen/right_button_size"
                     android:padding="@dimen/margin_small"
                     android:src="@drawable/nebehoir_car"/>
+                <include
+                    layout="@layout/view_normal_divider"
+                    ></include>
 
+                <ImageView
+                    android:id="@+id/garage_info"
+                    android:layout_width="@dimen/right_button_size"
+                    android:layout_height="@dimen/right_button_size"
+                    android:padding="@dimen/margin_small"
+                    android:src="@drawable/carlot"/>
             </LinearLayout>
         </android.support.v7.widget.CardView>
 

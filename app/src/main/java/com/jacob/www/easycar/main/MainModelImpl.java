@@ -5,6 +5,7 @@ import android.util.Log;
 import com.jacob.www.easycar.base.BaseModelImpl;
 import com.jacob.www.easycar.data.Data;
 import com.jacob.www.easycar.data.GarageBean;
+import com.jacob.www.easycar.data.GarageLotBean;
 import com.jacob.www.easycar.net.FilterSubscriber;
 import com.jacob.www.easycar.net.LoadingCallBack;
 
@@ -38,6 +39,28 @@ public class MainModelImpl extends BaseModelImpl implements Model {
                     public void onNext(GarageBean garageBeanData) {
                         callBack.loaded(garageBeanData);
                         Log.e("TAG",garageBeanData.getMessage());
+                    }
+                });
+    }
+
+    @Override
+    public void getLot(String gId,final LoadingCallBack callBack) {
+        api.getGarageLot(gId).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<GarageLotBean>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("TAG",e.getMessage()+"a a a a ");
+                    }
+
+                    @Override
+                    public void onNext(GarageLotBean garageLotBean) {
+                        callBack.loaded(garageLotBean);
                     }
                 });
     }
