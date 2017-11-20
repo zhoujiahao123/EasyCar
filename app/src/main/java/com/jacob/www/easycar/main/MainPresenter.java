@@ -3,6 +3,7 @@ package com.jacob.www.easycar.main;
 import android.util.Log;
 
 import com.jacob.www.easycar.data.GarageBean;
+import com.jacob.www.easycar.data.GarageLotBean;
 import com.jacob.www.easycar.net.LoadingCallBack;
 
 import java.util.ArrayList;
@@ -41,6 +42,23 @@ public class MainPresenter implements MainContract.Presenter {
     @Override
     public void start(double longitude, double latitude, double distance) {
         getNearGarage(longitude,latitude,distance);
+    }
+
+    @Override
+    public void getGarageLot(String gId) {
+        model.getLot(gId, new LoadingCallBack() {
+            @Override
+            public void loaded(Object data) {
+                if(data instanceof GarageLotBean){
+                    view.showLot(((GarageLotBean) data).getData().getParkingLotInfo());
+                }
+            }
+
+            @Override
+            public void error(String msg) {
+
+            }
+        });
     }
 
     @Override

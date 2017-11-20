@@ -14,11 +14,15 @@ import java.util.List;
 public interface MainContract {
     interface View  extends BaseView{
         void showGarage(GarageBean garageBeans);
+
+        void showLot(String lot);
     }
     interface Presenter extends BasePresenter{
         //需要presenter做的操作
         void getNearGarage(double longitude,double latitude,double distance);
 
         void start(double longitude,double latitude,double distance);
+
+        void getGarageLot(String gId);
     }
 }

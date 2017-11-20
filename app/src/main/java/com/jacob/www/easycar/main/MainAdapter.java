@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.amap.api.navi.model.NaviInfo;
 import com.jacob.www.easycar.R;
 import com.jacob.www.easycar.data.GarageBean;
 
@@ -22,16 +23,18 @@ public class MainAdapter extends PagerAdapter {
     private GarageBean bean;
 
     private TextView tvFreeLot,tvTotalLot,tvDesTime,tvDesKm,tvName;
+
     private Button btnNavi;
     public MainAdapter(Context context, GarageBean bean) {
         activity = (MainActivity) context;
         mLayoutInflater = LayoutInflater.from(context);
         this.bean = bean;
+
     }
 
     @Override
     public int getCount() {
-        return 5;
+        return bean.getData().size();
     }
 
     @Override
@@ -49,16 +52,17 @@ public class MainAdapter extends PagerAdapter {
         tvTotalLot = view.findViewById(R.id.tv_des_total);
         tvName = view.findViewById(R.id.tv_des_name);
         btnNavi = view.findViewById(R.id.btn_start_navi);
-        activity.getRealItem(bean.getData().get(0).getPositionLongitude(),bean.getData().get(0).getPositionLatitude());
+        activity.getRealItem(bean.getData().get(position).getPositionLongitude(),bean.getData().get(position).getPositionLatitude());
         btnNavi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                activity.startNavi(bean.getData().get(0).getPositionLatitude(),bean.getData().get(0).getPositionLongitude());
+                activity.startNavi(bean.getData().get(position).getPositionLatitude(),bean.getData().get(position).getPositionLongitude());
+                activity.setGarageId(bean.getData().get(position).getGarageId());
             }
         });
-        tvName.setText(bean.getData().get(0).getGarageName());
-        tvTotalLot.setText("车库总车位："+bean.getData().get(0).getParkingLotCount());
-        tvFreeLot.setText("目前剩余车位："+bean.getData().get(0).getFreeParkingLotCount());
+        tvName.setText(bean.getData().get(position).getGarageName());
+        tvTotalLot.setText("车库总车位："+bean.getData().get(position).getParkingLotCount());
+        tvFreeLot.setText("目前剩余车位："+bean.getData().get(position).getFreeParkingLotCount());
         container.addView(view);
         return view;
     }

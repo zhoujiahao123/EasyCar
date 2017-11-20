@@ -8,4 +8,6 @@ import com.jacob.www.easycar.net.LoadingCallBack;
 
 public interface Model  {
     void getData(double longitude,double latitude,double distance,LoadingCallBack callBack);
+
+    void getLot(String gId,LoadingCallBack callBack);
 }

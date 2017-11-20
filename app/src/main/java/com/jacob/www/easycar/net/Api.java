@@ -2,6 +2,7 @@ package com.jacob.www.easycar.net;
 
 import com.jacob.www.easycar.data.Data;
 import com.jacob.www.easycar.data.GarageBean;
+import com.jacob.www.easycar.data.GarageLotBean;
 import com.jacob.www.easycar.data.UserBean;
 
 import java.util.List;
@@ -29,4 +30,6 @@ public interface Api {
     @GET("garage/near")
     Observable<GarageBean> getNearGarage(@Query("longitude") double longitude, @Query("latitude") double latitude, @Query("distance") double distance);
 
+    @GET("garage")
+    Observable<GarageLotBean> getGarageLot(@Query("garageId")String garageId);
 }

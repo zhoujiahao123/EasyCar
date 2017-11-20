@@ -90,11 +90,11 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     AMapNavi mAMapNavi;
     MainContract.Presenter presenter;
     //起始点经纬度
-    protected final List<NaviLatLng> sList = new ArrayList<NaviLatLng>();
+    protected List<NaviLatLng> sList = new ArrayList<NaviLatLng>();
     //终点经纬度
-    protected final List<NaviLatLng> eList = new ArrayList<NaviLatLng>();
+    protected List<NaviLatLng> eList = new ArrayList<NaviLatLng>();
     //途中经过的点的经纬度，一般都没用上
-    protected final List<NaviLatLng> mWayPointList = new ArrayList<NaviLatLng>();
+    protected List<NaviLatLng> mWayPointList = new ArrayList<NaviLatLng>();
     //获取 AMapNaviView 实例
     AMapNaviView mAMapNaviView;
     //地图对象
@@ -109,7 +109,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     GeocodeSearch geocodeSearch;
     InputtipsQuery query;
     Inputtips inputTips;
-
     //目前我所在位置的经纬度
     double myLongitude = 0, myLatitude = 0;
     @BindView(R.id.floating_search_view)
@@ -193,6 +192,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         NaviLatLng mEndLatlng = new NaviLatLng(latitude, longitude);
         //算路起点坐标
         NaviLatLng mStartLatlng = new NaviLatLng(myLatitude, myLongitude);
+
         sList.add(mStartLatlng);
         eList.add(mEndLatlng);
         mAMapNavi = AMapNavi.getInstance(App.getAppContext());
@@ -256,6 +256,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             e.printStackTrace();
         }
         mAMapNavi.calculateDriveRoute(sList, eList, mWayPointList, strategy);
+        eList.remove(0);
+        sList.remove(0);
     }
 
     @Override
@@ -318,9 +320,12 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     }
 
+    private NaviInfo naviInfo;
+
     @Override
     public void onNaviInfoUpdate(NaviInfo naviInfo) {
-
+        this.naviInfo = naviInfo;
+        Log.e(TAG, naviInfo.getPathRetainDistance() + "      " + naviInfo.getPathRetainTime());
     }
 
     @Override
@@ -361,8 +366,48 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     //算路成功后执行的
     @Override
     public void onCalculateRouteSuccess(int[] ints) {
-        Log.e(TAG, "GPS");
+
+        if (horizontalInfiniteCycleViewPager != null && horizontalInfiniteCycleViewPager.getVisibility() == View.VISIBLE) {
+            horizontalInfiniteCycleViewPager.setVisibility(View.INVISIBLE);
+        }
         mAMapNavi.startNavi(NaviType.GPS);
+        isNavi = true;
+    }
+
+    boolean isNavi = false;
+
+    @Override
+    public void onBackPressed() {
+        if (horizontalInfiniteCycleViewPager != null && horizontalInfiniteCycleViewPager.getVisibility() == View.INVISIBLE) {
+            Toast.makeText(this, "已退出导航", Toast.LENGTH_SHORT).show();
+            isNavi = false;
+            mAMapNavi.stopNavi();
+            horizontalInfiniteCycleViewPager = null;
+            mAMapNaviView.setVisibility(View.INVISIBLE);
+            aMap.clear();
+            myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATE);
+            aMap.setMyLocationStyle(myLocationStyle);
+            aMap.moveCamera(CameraUpdateFactory.zoomTo(nowZoom));
+            mMapView.setVisibility(View.VISIBLE);
+        } else if (horizontalInfiniteCycleViewPager != null) {
+            horizontalInfiniteCycleViewPager.setVisibility(View.INVISIBLE);
+            horizontalInfiniteCycleViewPager = null;
+            aMap.clear();
+            myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATE);
+            aMap.setMyLocationStyle(myLocationStyle);
+            aMap.moveCamera(CameraUpdateFactory.zoomTo(nowZoom));
+        } else if (isNavi) {
+            isNavi = false;
+            mAMapNavi.stopNavi();
+            mAMapNaviView.setVisibility(View.INVISIBLE);
+            aMap.clear();
+            myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATE);
+            aMap.setMyLocationStyle(myLocationStyle);
+            aMap.moveCamera(CameraUpdateFactory.zoomTo(nowZoom));
+            mMapView.setVisibility(View.VISIBLE);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -521,12 +566,13 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             Log.i(TAG, latLonPoint.getLatitude() + " " + latLonPoint.getLongitude() + "");
             Log.e(TAG, "开始搜索车库");
             presenter.getNearGarage(latLonPoint.getLongitude(), latLonPoint.getLatitude(), 2);
+            desLat = latLonPoint.getLatitude();
+            desLon = latLonPoint.getLongitude();
             //发起请求
         }
     }
 
-    boolean isSimulate = false;
-
+    double desLat, desLon;
 
     public void getRealItem(double lon, double lat) {
         LatLonPoint mEndPoint = new LatLonPoint(lat, lon);
@@ -542,11 +588,21 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void showGarage(GarageBean garageBean) {
-        bean = garageBean;
-        horizontalInfiniteCycleViewPager = (HorizontalInfiniteCycleViewPager) findViewById(R.id.hicvp);
-        MainAdapter adapter = new MainAdapter(this, garageBean);
-        horizontalInfiniteCycleViewPager.setAdapter(adapter);
+        if (garageBean.getData().size() == 0) {
+            Toast.makeText(this, "附近无车库", Toast.LENGTH_SHORT).show();
+            startNavi(desLat, desLon);
+        } else {
+            bean = garageBean;
+            horizontalInfiniteCycleViewPager = (HorizontalInfiniteCycleViewPager) findViewById(R.id.hicvp);
+            if (horizontalInfiniteCycleViewPager.getVisibility() == View.INVISIBLE) {
+                horizontalInfiniteCycleViewPager.setVisibility(View.VISIBLE);
+            }
+            MainAdapter adapter = new MainAdapter(this, garageBean);
+            horizontalInfiniteCycleViewPager.setAdapter(adapter);
+        }
     }
+
+
 
     @Override
     public void onBusRouteSearched(BusRouteResult busRouteResult, int i) {
@@ -558,6 +614,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         if (i == AMapException.CODE_AMAP_SUCCESS) {
             if (result != null && result.getPaths() != null) {
                 if (result.getPaths().size() > 0) {
+                    aMap.clear();
                     mDriveRouteResult = result;
                     DrivePath drivePath = mDriveRouteResult.getPaths()
                             .get(0);
@@ -634,5 +691,22 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         } else if (behavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
             behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
+    }
+
+    @OnClick(R.id.garage_info)
+    public void onClick() {
+        //得到二进制序列
+        presenter.getGarageLot(gId);
+    }
+    private String gId;
+    //用来设置当前的车库的id
+    public void setGarageId(String gId){
+        this.gId = gId;
+        Log.e(TAG,gId+"是gid");
+    }
+    //展示车位
+    @Override
+    public void showLot(String lot) {
+        Log.e(TAG,lot);
     }
 }
