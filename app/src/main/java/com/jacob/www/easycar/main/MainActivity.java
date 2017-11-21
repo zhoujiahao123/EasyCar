@@ -594,6 +594,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             desLat = latLonPoint.getLatitude();
             desLon = latLonPoint.getLongitude();
             is = false;
+            iis = false;
             //发起请求
         }
     }
@@ -614,6 +615,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         mRouteSearch.calculateDriveRouteAsyn(query);
     }
     boolean is = false;
+    boolean iis = false;
     public void calculate(double lon, double lat) {
         is = true;
         LatLonPoint mEndPoint = new LatLonPoint(lat, lon);
@@ -678,21 +680,26 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                             mDriveRouteResult.getStartPos(),
                             mDriveRouteResult.getTargetPos(), null);
                     //设置节点marker是否显示
-                    drivingRouteOverlay.setNodeIconVisibility(false);
-                    //是否用颜色展示交通拥堵情况，默认true
-                    drivingRouteOverlay.setIsColorfulline(true);
-                    drivingRouteOverlay.removeFromMap();
-                    drivingRouteOverlay.addToMap();
-                    drivingRouteOverlay.zoomToSpan();
+//                    drivingRouteOverlay.setNodeIconVisibility(false);
+//                    //是否用颜色展示交通拥堵情况，默认true
+//                    drivingRouteOverlay.setIsColorfulline(true);
+//                    drivingRouteOverlay.removeFromMap();
+//                    drivingRouteOverlay.addToMap();
+//                    drivingRouteOverlay.zoomToSpan();
                     int dis = (int) drivePath.getDistance();
                     int dur = (int) drivePath.getDuration();
+                    Log.e("TAG","外面层显示了");
+                    if(iis){
+                        Log.e("TAG","内面层显示了");
+                        drivingRouteOverlay.setNodeIconVisibility(false);
+                        //是否用颜色展示交通拥堵情况，默认true
+                        drivingRouteOverlay.setIsColorfulline(true);
+                        drivingRouteOverlay.removeFromMap();
+                        drivingRouteOverlay.addToMap();
+                        drivingRouteOverlay.zoomToSpan();
+                    }
                     if(!is){
-//                        drivingRouteOverlay.setNodeIconVisibility(false);
-//                        //是否用颜色展示交通拥堵情况，默认true
-//                        drivingRouteOverlay.setIsColorfulline(true);
-//                        drivingRouteOverlay.removeFromMap();
-//                        drivingRouteOverlay.addToMap();
-//                        drivingRouteOverlay.zoomToSpan();
+
                         if(!diss.contains(dis)){
                             diss.add(dis);
                         }
@@ -706,6 +713,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                             Log.e("TAG","调用这个");
                             Log.e("TAG",times.size()+"   -----"+bean.getData().size());
                             if(times.size()==bean.getData().size()){
+                                iis =true;
                                 Log.e("TAG",times.size()+"   -----"+bean.getData().size());
                                 horizontalInfiniteCycleViewPager = (HorizontalInfiniteCycleViewPager) findViewById(R.id.hicvp);
                                 if (horizontalInfiniteCycleViewPager.getVisibility() == View.INVISIBLE) {
