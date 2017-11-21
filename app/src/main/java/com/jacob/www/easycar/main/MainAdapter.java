@@ -2,13 +2,14 @@ package com.jacob.www.easycar.main;
 
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.amap.api.navi.model.NaviInfo;
+import com.gigamole.infinitecycleviewpager.HorizontalInfiniteCycleViewPager;
 import com.jacob.www.easycar.R;
 import com.jacob.www.easycar.data.GarageBean;
 
@@ -23,13 +24,13 @@ public class MainAdapter extends PagerAdapter {
     private GarageBean bean;
 
     private TextView tvFreeLot,tvTotalLot,tvDesTime,tvDesKm,tvName;
-
+    HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager;
     private Button btnNavi;
-    public MainAdapter(Context context, GarageBean bean) {
+    public MainAdapter(Context context, GarageBean bean,HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager) {
         activity = (MainActivity) context;
         mLayoutInflater = LayoutInflater.from(context);
         this.bean = bean;
-
+        this.horizontalInfiniteCycleViewPager = horizontalInfiniteCycleViewPager;
     }
 
     @Override
@@ -41,7 +42,7 @@ public class MainAdapter extends PagerAdapter {
     public int getItemPosition(final Object object) {
         return POSITION_NONE;
     }
-
+    int pos = 0;
     @Override
     public Object instantiateItem(final ViewGroup container, final int position) {
         final View view;
@@ -52,10 +53,11 @@ public class MainAdapter extends PagerAdapter {
         tvTotalLot = view.findViewById(R.id.tv_des_total);
         tvName = view.findViewById(R.id.tv_des_name);
         btnNavi = view.findViewById(R.id.btn_start_navi);
-        activity.getRealItem(bean.getData().get(position).getPositionLongitude(),bean.getData().get(position).getPositionLatitude());
+        activity.getRealItem(bean.getData().get(horizontalInfiniteCycleViewPager.getRealItem()).getPositionLongitude(),bean.getData().get(horizontalInfiniteCycleViewPager.getRealItem()).getPositionLatitude());
         btnNavi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.e("TAG",position+"当前导航采用的position");
                 activity.startNavi(bean.getData().get(position).getPositionLatitude(),bean.getData().get(position).getPositionLongitude());
                 activity.setGarageId(bean.getData().get(position).getGarageId());
             }

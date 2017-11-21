@@ -609,7 +609,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             if (horizontalInfiniteCycleViewPager.getVisibility() == View.INVISIBLE) {
                 horizontalInfiniteCycleViewPager.setVisibility(View.VISIBLE);
             }
-            MainAdapter adapter = new MainAdapter(this, garageBean);
+            MainAdapter adapter = new MainAdapter(this, garageBean,horizontalInfiniteCycleViewPager);
             horizontalInfiniteCycleViewPager.setAdapter(adapter);
         }
     }
