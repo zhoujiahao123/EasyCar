@@ -94,7 +94,11 @@ public class MainAdapter extends PagerAdapter {
         tvName.setText(bean.getData().get(position).getGarageName());
         tvTotalLot.setText("车库总车位："+bean.getData().get(position).getParkingLotCount());
         tvFreeLot.setText("目前剩余车位："+bean.getData().get(position).getFreeParkingLotCount());
-        tvDesTime.setText("时间："+times.get(position)/60+"分钟");
+        if(times.get(position)/60==0){
+            tvDesTime.setText("时间："+"1分钟");
+        }else {
+            tvDesTime.setText("时间："+times.get(position)/60+"分钟");
+        }
         tvDesKm.setText("距离："+((double)diss.get(position))/1000+"公里");
         container.addView(view);
         return view;
