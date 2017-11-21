@@ -1,6 +1,7 @@
 package com.jacob.www.easycar.main;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -590,6 +591,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             presenter.getNearGarage(latLonPoint.getLongitude(), latLonPoint.getLatitude(), 2);
             desLat = latLonPoint.getLatitude();
             desLon = latLonPoint.getLongitude();
+            is = false;
             //发起请求
         }
     }
@@ -604,24 +606,39 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 null, "");// 第一个参数表示路径规划的起点和终点，第二个参数表示驾车模式，第三个参数表示途经点，第四个参数表示避让区域，第五个参数表示避让道路
         mRouteSearch.calculateDriveRouteAsyn(query);// 异步路径规划驾车模式查询
     }
+    boolean is = false;
+    public void calculate(double lon, double lat) {
+        is = true;
+        LatLonPoint mEndPoint = new LatLonPoint(lat, lon);
+        RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(
+                new LatLonPoint(myLatitude, myLongitude), mEndPoint);
+        RouteSearch.DriveRouteQuery query = new RouteSearch.DriveRouteQuery(fromAndTo, RouteSearch.DrivingDefault, null,
+                null, "");// 第一个参数表示路径规划的起点和终点，第二个参数表示驾车模式，第三个参数表示途经点，第四个参数表示避让区域，第五个参数表示避让道路
+        mRouteSearch.calculateDriveRouteAsyn(query);// 异步路径规划驾车模式查询
+    }
 
     HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager;
     GarageBean bean;
-
+    MainAdapter adapter;
     @Override
     public void showGarage(GarageBean garageBean) {
-        if (garageBean.getData().size() == 0) {
-            Toast.makeText(this, "附近无车库", Toast.LENGTH_SHORT).show();
-            startNavi(desLat, desLon);
-        } else {
-            bean = garageBean;
-            horizontalInfiniteCycleViewPager = (HorizontalInfiniteCycleViewPager) findViewById(R.id.hicvp);
-            if (horizontalInfiniteCycleViewPager.getVisibility() == View.INVISIBLE) {
-                horizontalInfiniteCycleViewPager.setVisibility(View.VISIBLE);
-            }
-            MainAdapter adapter = new MainAdapter(this, garageBean,horizontalInfiniteCycleViewPager);
-            horizontalInfiniteCycleViewPager.setAdapter(adapter);
+        bean = garageBean;
+        for(int i =0;i<garageBean.getData().size();i++){
+            getRealItem(garageBean.getData().get(i).getPositionLongitude(),garageBean.getData().get(i).getPositionLatitude());
         }
+
+//        if (garageBean.getData().size() == 0) {
+//            Toast.makeText(this, "附近无车库", Toast.LENGTH_SHORT).show();
+//            startNavi(desLat, desLon);
+//        } else {
+//            bean = garageBean;
+//            horizontalInfiniteCycleViewPager = (HorizontalInfiniteCycleViewPager) findViewById(R.id.hicvp);
+//            if (horizontalInfiniteCycleViewPager.getVisibility() == View.INVISIBLE) {
+//                horizontalInfiniteCycleViewPager.setVisibility(View.VISIBLE);
+//            }
+//            adapter = new MainAdapter(this, garageBean,horizontalInfiniteCycleViewPager);
+//            horizontalInfiniteCycleViewPager.setAdapter(adapter);
+//        }
     }
 
 
@@ -629,7 +646,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     public void onBusRouteSearched(BusRouteResult busRouteResult, int i) {
 
     }
-
+    List<Integer> diss  = new ArrayList<>();
+    List<Integer> times = new ArrayList<>();
     @Override
     public void onDriveRouteSearched(DriveRouteResult result, int i) {
         if (i == AMapException.CODE_AMAP_SUCCESS) {
@@ -650,9 +668,36 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                     drivingRouteOverlay.removeFromMap();
                     drivingRouteOverlay.addToMap();
                     drivingRouteOverlay.zoomToSpan();
+                    int dis = (int) drivePath.getDistance();
+                    int dur = (int) drivePath.getDuration();
+                    if(!is){
+                        if(!diss.contains(dis)){
+                            diss.add(dis);
+                        }
+                        if(!times.contains(dur)){
+                            times.add(dur);
+                        }
+                        if (bean.getData().size() == 0) {
+                            Toast.makeText(this, "附近无车库", Toast.LENGTH_SHORT).show();
+                            startNavi(desLat, desLon);
+                        } else {
+                            Log.e("TAG","调用这个");
+                            if(times.size()==bean.getData().size()){
+                                Log.e("TAG",times.size()+"   -----"+bean.getData().size());
+                                horizontalInfiniteCycleViewPager = (HorizontalInfiniteCycleViewPager) findViewById(R.id.hicvp);
+                                if (horizontalInfiniteCycleViewPager.getVisibility() == View.INVISIBLE) {
+                                    horizontalInfiniteCycleViewPager.setVisibility(View.VISIBLE);
+                                }
+                                adapter = new MainAdapter(this, bean,horizontalInfiniteCycleViewPager,diss,times);
+                                horizontalInfiniteCycleViewPager.setAdapter(adapter);
+                            }
+                        }
+
+                    }
                 }
             }
         }
+
     }
 
     @Override
