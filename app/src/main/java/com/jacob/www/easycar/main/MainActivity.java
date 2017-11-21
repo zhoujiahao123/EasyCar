@@ -622,9 +622,16 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     MainAdapter adapter;
     @Override
     public void showGarage(GarageBean garageBean) {
-        bean = garageBean;
-        for(int i =0;i<garageBean.getData().size();i++){
-            getRealItem(garageBean.getData().get(i).getPositionLongitude(),garageBean.getData().get(i).getPositionLatitude());
+        Log.e(TAG,"showGarage");
+        Log.e(TAG,"size"+garageBean.getData().size());
+        if(garageBean.getData().size()==0){
+            Toast.makeText(this, "附近无车库", Toast.LENGTH_SHORT).show();
+            startNavi(desLat, desLon);
+        }else {
+            bean = garageBean;
+            for(int i =0;i<garageBean.getData().size();i++){
+                getRealItem(garageBean.getData().get(i).getPositionLongitude(),garageBean.getData().get(i).getPositionLatitude());
+            }
         }
 
 //        if (garageBean.getData().size() == 0) {
