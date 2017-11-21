@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -66,6 +67,7 @@ import com.jacob.www.easycar.login.LogInActivity;
 import com.jacob.www.easycar.net.ResponseCons;
 import com.jacob.www.easycar.overlay.DrivingRouteOverlay;
 import com.jacob.www.easycar.util.DisplayUtil;
+import com.jacob.www.easycar.util.ProgressDialogUtils;
 import com.jacob.www.easycar.util.SpUtil;
 import com.jacob.www.easycar.util.ToActivityUtil;
 import com.jacob.www.easycar.widget.CircleImageView;
@@ -399,6 +401,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     public void onBackPressed() {
         if (horizontalInfiniteCycleViewPager != null && horizontalInfiniteCycleViewPager.getVisibility() == View.INVISIBLE) {
             Toast.makeText(this, "已退出导航", Toast.LENGTH_SHORT).show();
+            setGarageId("0");
             isNavi = false;
             mAMapNavi.stopNavi();
             horizontalInfiniteCycleViewPager = null;
@@ -512,12 +515,12 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void showProgress() {
-
+        ProgressDialogUtils.getInstance().showProgress(this, "加载中...");
     }
 
     @Override
     public void hideProgress() {
-
+        ProgressDialogUtils.getInstance().hideProgress();
     }
 
     @Override
@@ -732,15 +735,25 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void showLot(String lot) {
+        int num = lot.length();
         LinearLayout dialogLinear = new LinearLayout(this);
-        dialogLinear.setOrientation(LinearLayout.HORIZONTAL);
+        dialogLinear.setOrientation(LinearLayout.VERTICAL);
         dialogLinear.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         dialogLinear.setGravity(Gravity.CENTER);
+
         DisplayMetrics dm = this.getResources().getDisplayMetrics();
         LinearLayout.LayoutParams chidLp = new LinearLayout.LayoutParams(DisplayUtil.dip2px(60, dm.density), DisplayUtil.dip2px(60, dm.density));
         chidLp.setMargins(DisplayUtil.dip2px(8, dm.density), DisplayUtil.dip2px(8, dm.density), DisplayUtil.dip2px(8, dm.density), DisplayUtil.dip2px(8, dm.density));
-
-        for (int i = 0; i < lot.length(); i++) {
+        //一行4个
+        int oneLineNum = 4;
+        LinearLayout oneLineLinear = null;
+        for (int i = 0; i < num; i++) {
+            if (i % oneLineNum == 0) {
+                oneLineLinear = new LinearLayout(this);
+                oneLineLinear.setOrientation(LinearLayout.HORIZONTAL);
+                oneLineLinear.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                dialogLinear.addView(oneLineLinear);
+            }
             GarageImage garageImage = new GarageImage(this);
             garageImage.setLayoutParams(chidLp);
             garageImage.setText(i + 1 + "");
@@ -749,13 +762,33 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 garageImage.setFillColor(lot.toCharArray()[i] == '0' ? getColor(R.color.red) : getColor(R.color.green));
                 garageImage.setWordColor(getColor(R.color.white));
             }
-            dialogLinear.addView(garageImage);
+            oneLineLinear.addView(garageImage);
         }
+
         new AlertDialog.Builder(this)
-                .setTitle("当前车库信息")
+                .setTitle("当前车库可用情况")
                 .setView(dialogLinear)
                 .setCancelable(true)
-                .setPositiveButton("好的", new DialogInterface.OnClickListener() {
+                .setPositiveButton("车库分布图", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        ImageView imageView = new ImageView(MainActivity.this);
+                        imageView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                        Glide.with(MainActivity.this).load(ResponseCons.GARAGE_IMAGE + gId + ".png").into(imageView);
+                        new AlertDialog.Builder(MainActivity.this)
+                                .setTitle("当前车库分布图")
+                                .setView(imageView)
+                                .setCancelable(true)
+                                .setPositiveButton("好的", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
+                                    }
+                                }).show();
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.dismiss();
