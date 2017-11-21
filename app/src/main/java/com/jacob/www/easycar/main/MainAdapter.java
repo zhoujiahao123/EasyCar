@@ -2,7 +2,6 @@ package com.jacob.www.easycar.main;
 
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by ASUS-NB on 2017/11/16.
+ * @author ASUS-NB
+ * @date 2017/11/16
  */
 
 public class MainAdapter extends PagerAdapter {
@@ -25,19 +25,36 @@ public class MainAdapter extends PagerAdapter {
     private MainActivity activity;
     private LayoutInflater mLayoutInflater;
     private GarageBean bean;
-
-    private TextView tvFreeLot,tvTotalLot,tvDesTime,tvDesKm,tvName;
-    HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager;
+    private HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager;
+    private TextView tvFreeLot, tvTotalLot, tvDesTime, tvDesKm, tvName;
     private Button btnNavi;
     List<Integer> diss  = new ArrayList<>();
     List<Integer> times = new ArrayList<>();
     public MainAdapter(Context context, GarageBean bean,HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager,List<Integer> diss,List<Integer> times) {
+
         activity = (MainActivity) context;
         mLayoutInflater = LayoutInflater.from(context);
         this.bean = bean;
         this.horizontalInfiniteCycleViewPager = horizontalInfiniteCycleViewPager;
         this.diss = diss;
         this.times = times;
+    }
+
+    public interface onButtonItemClickListener {
+        void startNavi(double lat, double lot);
+
+        void setGarageId(String id);
+    }
+
+    public interface onDriveRouteGenerate {
+        void generate();
+    }
+
+
+    private onButtonItemClickListener buttonItemClickListener;
+
+    public void setButtonItemClickListener(onButtonItemClickListener buttonItemClickListener) {
+        this.buttonItemClickListener = buttonItemClickListener;
     }
 
     @Override
@@ -49,11 +66,17 @@ public class MainAdapter extends PagerAdapter {
     public int getItemPosition(final Object object) {
         return POSITION_NONE;
     }
+
+
+    @Override
+    public Object instantiateItem(View container, int position) {
+        return super.instantiateItem(container, position);
+    }
+
     @Override
     public Object instantiateItem(final ViewGroup container, final int position) {
         final View view;
-        view = mLayoutInflater.inflate(R.layout.fragment_route,container,false);
-        Log.e("TAG","当前position"+position);
+        view = mLayoutInflater.inflate(R.layout.fragment_route, container, false);
         tvDesKm = view.findViewById(R.id.tv_des_km);
         tvDesTime = view.findViewById(R.id.tv_des_time);
         tvFreeLot = view.findViewById(R.id.tv_des_free);
@@ -64,9 +87,9 @@ public class MainAdapter extends PagerAdapter {
         btnNavi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.e("TAG",position+"当前导航采用的position");
-                activity.startNavi(bean.getData().get(position).getPositionLatitude(),bean.getData().get(position).getPositionLongitude());
-                activity.setGarageId(bean.getData().get(position).getGarageId());
+                buttonItemClickListener.setGarageId(bean.getData().get(position).getGarageId());
+                buttonItemClickListener.startNavi(bean.getData().get(position).getPositionLatitude(), bean.getData().get(position).getPositionLongitude());
+
             }
         });
         tvName.setText(bean.getData().get(position).getGarageName());

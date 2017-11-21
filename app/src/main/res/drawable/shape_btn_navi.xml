@@ -4,8 +4,8 @@
     <solid android:color="#00ff00ff"/>
     <!--边界白色-->
     <stroke
-        android:width="0.5dp"
-        android:color="#1296db" >
+        android:width="1dp"
+        android:color="@color/colorAccent" >
     </stroke>
     <corners android:radius="5dp"/>
 </shape>

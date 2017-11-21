@@ -13,8 +13,8 @@
         android:layout_height="wrap_content">
         <ImageView
             android:src="@drawable/building"
-            android:layout_width="40dp"
-            android:layout_height="50dp"
+            android:layout_width="@dimen/image_size_normal"
+            android:layout_height="@dimen/image_size_normal"
             android:layout_margin="30dp"/>
         <TextView
             android:id="@+id/tv_des_name"
@@ -79,7 +79,7 @@
         android:layout_marginRight="30dp"
         android:textSize="18sp"
         android:text="开始导航"
-        android:textColor="#1296db"
+        android:textColor="@color/colorAccent"
         android:background="@drawable/selector_btn_navi"
         android:layout_marginTop="160dp"/>
 </RelativeLayout>
