@@ -77,6 +77,7 @@ import com.zxr.medicalaid.User;
 import com.zxr.medicalaid.UserDao;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
@@ -686,6 +687,12 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                     int dis = (int) drivePath.getDistance();
                     int dur = (int) drivePath.getDuration();
                     if(!is){
+//                        drivingRouteOverlay.setNodeIconVisibility(false);
+//                        //是否用颜色展示交通拥堵情况，默认true
+//                        drivingRouteOverlay.setIsColorfulline(true);
+//                        drivingRouteOverlay.removeFromMap();
+//                        drivingRouteOverlay.addToMap();
+//                        drivingRouteOverlay.zoomToSpan();
                         if(!diss.contains(dis)){
                             diss.add(dis);
                         }
@@ -697,14 +704,23 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                             startNavi(desLat, desLon);
                         } else {
                             Log.e("TAG","调用这个");
+                            Log.e("TAG",times.size()+"   -----"+bean.getData().size());
                             if(times.size()==bean.getData().size()){
                                 Log.e("TAG",times.size()+"   -----"+bean.getData().size());
                                 horizontalInfiniteCycleViewPager = (HorizontalInfiniteCycleViewPager) findViewById(R.id.hicvp);
                                 if (horizontalInfiniteCycleViewPager.getVisibility() == View.INVISIBLE) {
                                     horizontalInfiniteCycleViewPager.setVisibility(View.VISIBLE);
                                 }
-                                adapter = new MainAdapter(this, bean,horizontalInfiniteCycleViewPager,diss,times);
+                                List<Integer> diss2  = new ArrayList<>();
+                                List<Integer> times2 = new ArrayList<>();
+                                diss2.addAll(diss);
+                                times2.addAll(times);
+                                adapter = new MainAdapter(this, bean,horizontalInfiniteCycleViewPager,diss2,times2);
+                                diss.clear();
+                                times.clear();
+                                Log.e("TAG,他的大小是",diss.size()+"---"+ times.size());
                                 horizontalInfiniteCycleViewPager.setAdapter(adapter);
+
                                 //设置导航
                                 adapter.setButtonItemClickListener(new MainAdapter.onButtonItemClickListener() {
                                     @Override
