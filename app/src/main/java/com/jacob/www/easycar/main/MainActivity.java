@@ -344,11 +344,15 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
     private NaviInfo naviInfo;
-
+    boolean isShow = true;
     @Override
     public void onNaviInfoUpdate(NaviInfo naviInfo) {
         this.naviInfo = naviInfo;
         Log.e(TAG, naviInfo.getPathRetainDistance() + "      " + naviInfo.getPathRetainTime());
+        if(naviInfo.getPathRetainDistance()<100&&isShow){
+            presenter.getGarageLot(gId);
+            isShow = false;
+        }
     }
 
     @Override
@@ -393,7 +397,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         if (horizontalInfiniteCycleViewPager != null && horizontalInfiniteCycleViewPager.getVisibility() == View.VISIBLE) {
             horizontalInfiniteCycleViewPager.setVisibility(View.INVISIBLE);
         }
-        mAMapNavi.startNavi(NaviType.GPS);
+        mAMapNavi.startNavi(NaviType.EMULATOR);
         isNavi = true;
     }
 
@@ -401,6 +405,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void onBackPressed() {
+        isShow  = true;
         if (horizontalInfiniteCycleViewPager != null && horizontalInfiniteCycleViewPager.getVisibility() == View.INVISIBLE) {
             Toast.makeText(this, "已退出导航", Toast.LENGTH_SHORT).show();
             mSearchView.setVisibility(View.VISIBLE);
@@ -776,6 +781,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 changBottomSheet(0);
                 break;
             case R.id.neighbor_garage:
+                is = false;
                 changBottomSheet(1);
                 presenter.getNearGarage(myLongitude, myLatitude, 2);
                 break;
@@ -892,6 +898,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+
                         dialogInterface.dismiss();
                     }
                 })
