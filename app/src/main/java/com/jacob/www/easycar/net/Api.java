@@ -5,8 +5,6 @@ import com.jacob.www.easycar.data.GarageBean;
 import com.jacob.www.easycar.data.GarageLotBean;
 import com.jacob.www.easycar.data.UserBean;
 
-import java.util.List;
-
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -15,7 +13,9 @@ import retrofit2.http.Query;
 import rx.Observable;
 
 /**
- * Created by ASUS-NB on 2017/11/12.
+ *
+ * @author ASUS-NB
+ * @date 2017/11/12
  */
 
 public interface Api {

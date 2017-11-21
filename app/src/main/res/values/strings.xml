@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">EasyCar</string>
+    <string name="app_name">EasyPark</string>
     <string name="load_success">加载成功</string>
     <string name="load_failed">加载失败</string>
     <string name="login_success">登录成功</string>

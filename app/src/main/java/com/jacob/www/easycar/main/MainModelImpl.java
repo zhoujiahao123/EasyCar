@@ -3,19 +3,18 @@ package com.jacob.www.easycar.main;
 import android.util.Log;
 
 import com.jacob.www.easycar.base.BaseModelImpl;
-import com.jacob.www.easycar.data.Data;
 import com.jacob.www.easycar.data.GarageBean;
 import com.jacob.www.easycar.data.GarageLotBean;
-import com.jacob.www.easycar.net.FilterSubscriber;
 import com.jacob.www.easycar.net.LoadingCallBack;
+import com.jacob.www.easycar.net.ResponseCons;
 
-import rx.Scheduler;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 /**
- * Created by ASUS-NB on 2017/11/12.
+ * @author ASUS-NB
+ * @date 2017/11/12
  */
 
 public class MainModelImpl extends BaseModelImpl implements Model {
@@ -32,19 +31,19 @@ public class MainModelImpl extends BaseModelImpl implements Model {
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.e("TAG",e.getMessage());
+                        Log.e("TAG", e.getMessage());
                     }
 
                     @Override
                     public void onNext(GarageBean garageBeanData) {
                         callBack.loaded(garageBeanData);
-                        Log.e("TAG",garageBeanData.getMessage());
+                        Log.e("TAG", garageBeanData.getMessage());
                     }
                 });
     }
 
     @Override
-    public void getLot(String gId,final LoadingCallBack callBack) {
+    public void getLot(String gId, final LoadingCallBack callBack) {
         api.getGarageLot(gId).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<GarageLotBean>() {
@@ -55,7 +54,12 @@ public class MainModelImpl extends BaseModelImpl implements Model {
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.e("TAG",e.getMessage()+"a a a a ");
+                        Log.i("Error", e.getMessage());
+                        if (ResponseCons.HTTP400.equals(e.getMessage())) {
+                            callBack.error("选择车库后，才能看到车库的详细信息哦");
+                        } else {
+                            callBack.error(e.getMessage());
+                        }
                     }
 
                     @Override

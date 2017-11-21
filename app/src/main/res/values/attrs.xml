@@ -7,4 +7,11 @@
     <declare-styleable name="CircleView">
         <attr name="color" format="color"></attr>
     </declare-styleable>
+    
+    <declare-styleable name="GarageImage">
+        <attr name="word_color" format="color"></attr>
+        <attr name="fill_color" format="color"></attr>
+        <attr name="text" format="string"></attr>
+        <attr name="textSize" format="dimension"></attr>
+    </declare-styleable>
 </resources>
