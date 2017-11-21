@@ -224,25 +224,9 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         mAMapNaviView.setAMapNaviViewListener(this);
         AMapNaviViewOptions options = mAMapNaviView.getViewOptions();
         options.setLayoutVisible(false);
-        options.setTilt(45);
         mAMapNaviView.setViewOptions(options);
         onInitNaviSuccess();
     }
-
-    int dimens = 3;
-
-    private void changDimens(AMapNaviView mAMapNaviView) {
-        AMapNaviViewOptions options = mAMapNaviView.getViewOptions();
-        if (dimens == 2) {
-            options.setTilt(0);
-            dimens = 3;
-        } else if (dimens == 3) {
-            options.setTilt(45);
-            dimens = 2;
-        }
-        mAMapNaviView.setViewOptions(options);
-    }
-
 
     @Override
     public void onMyLocationChange(Location location) {
@@ -360,11 +344,15 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
     private NaviInfo naviInfo;
-
+    boolean isShow = true;
     @Override
     public void onNaviInfoUpdate(NaviInfo naviInfo) {
         this.naviInfo = naviInfo;
         Log.e(TAG, naviInfo.getPathRetainDistance() + "      " + naviInfo.getPathRetainTime());
+        if(naviInfo.getPathRetainDistance()<100&&isShow){
+            presenter.getGarageLot(gId);
+            isShow = false;
+        }
     }
 
     @Override
@@ -409,7 +397,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         if (horizontalInfiniteCycleViewPager != null && horizontalInfiniteCycleViewPager.getVisibility() == View.VISIBLE) {
             horizontalInfiniteCycleViewPager.setVisibility(View.INVISIBLE);
         }
-        mAMapNavi.startNavi(NaviType.GPS);
+        mAMapNavi.startNavi(NaviType.EMULATOR);
         isNavi = true;
     }
 
@@ -417,6 +405,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void onBackPressed() {
+        isShow  = true;
         if (horizontalInfiniteCycleViewPager != null && horizontalInfiniteCycleViewPager.getVisibility() == View.INVISIBLE) {
             Toast.makeText(this, "已退出导航", Toast.LENGTH_SHORT).show();
             mSearchView.setVisibility(View.VISIBLE);
@@ -637,11 +626,9 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         LatLonPoint mEndPoint = new LatLonPoint(lat, lon);
         RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(
                 new LatLonPoint(myLatitude, myLongitude), mEndPoint);
-        // 第一个参数表示路径规划的起点和终点，第二个参数表示驾车模式，第三个参数表示途经点，第四个参数表示避让区域，第五个参数表示避让道路
         RouteSearch.DriveRouteQuery query = new RouteSearch.DriveRouteQuery(fromAndTo, RouteSearch.DrivingDefault, null,
-                null, "");
-        // 异步路径规划驾车模式查询
-        mRouteSearch.calculateDriveRouteAsyn(query);
+                null, "");// 第一个参数表示路径规划的起点和终点，第二个参数表示驾车模式，第三个参数表示途经点，第四个参数表示避让区域，第五个参数表示避让道路
+        mRouteSearch.calculateDriveRouteAsyn(query);// 异步路径规划驾车模式查询
     }
 
 
@@ -662,7 +649,19 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 getRealItem(garageBean.getData().get(i).getPositionLongitude(),garageBean.getData().get(i).getPositionLatitude());
             }
         }
-        
+
+//        if (garageBean.getData().size() == 0) {
+//            Toast.makeText(this, "附近无车库", Toast.LENGTH_SHORT).show();
+//            startNavi(desLat, desLon);
+//        } else {
+//            bean = garageBean;
+//            horizontalInfiniteCycleViewPager = (HorizontalInfiniteCycleViewPager) findViewById(R.id.hicvp);
+//            if (horizontalInfiniteCycleViewPager.getVisibility() == View.INVISIBLE) {
+//                horizontalInfiniteCycleViewPager.setVisibility(View.VISIBLE);
+//            }
+//            adapter = new MainAdapter(this, garageBean,horizontalInfiniteCycleViewPager);
+//            horizontalInfiniteCycleViewPager.setAdapter(adapter);
+//        }
     }
 
 
@@ -774,22 +773,17 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.location:
-                if (myLatitude != 0 && !isNavi) {
+                if (myLatitude != 0) {
                     aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(myLatitude, myLongitude), nowZoom));
-                } else if (isNavi && mAMapNavi != null) {
-                    //切换3D到2D
-                    changDimens(mAMapNaviView);
-                    
                 }
                 break;
             case R.id.person_age:
                 changBottomSheet(0);
                 break;
             case R.id.neighbor_garage:
-                if (!isNavi) {
-                    changBottomSheet(1);
-                    presenter.getNearGarage(myLongitude, myLatitude, 2);
-                }
+                is = false;
+                changBottomSheet(1);
+                presenter.getNearGarage(myLongitude, myLatitude, 2);
                 break;
             case R.id.log_off:
                 new AlertDialog.Builder(this)
@@ -904,6 +898,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+
                         dialogInterface.dismiss();
                     }
                 })
