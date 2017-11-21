@@ -222,9 +222,25 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         mAMapNaviView.setAMapNaviViewListener(this);
         AMapNaviViewOptions options = mAMapNaviView.getViewOptions();
         options.setLayoutVisible(false);
+        options.setTilt(45);
         mAMapNaviView.setViewOptions(options);
         onInitNaviSuccess();
     }
+
+    int dimens = 3;
+
+    private void changDimens(AMapNaviView mAMapNaviView) {
+        AMapNaviViewOptions options = mAMapNaviView.getViewOptions();
+        if (dimens == 2) {
+            options.setTilt(0);
+            dimens = 3;
+        } else if (dimens == 3) {
+            options.setTilt(45);
+            dimens = 2;
+        }
+        mAMapNaviView.setViewOptions(options);
+    }
+
 
     @Override
     public void onMyLocationChange(Location location) {
@@ -627,7 +643,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             adapter.setButtonItemClickListener(new MainAdapter.onButtonItemClickListener() {
                 @Override
                 public void startNavi(double lat, double lot) {
-                    Log.i(TAG,lat+" "+lot);
+                    Log.i(TAG, lat + " " + lot);
                     MainActivity.this.startNavi(lat, lot);
                     //隐藏
                     mSearchView.setVisibility(View.INVISIBLE);
@@ -687,16 +703,22 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.location:
-                if (myLatitude != 0) {
+                if (myLatitude != 0 && !isNavi) {
                     aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(myLatitude, myLongitude), nowZoom));
+                } else if (isNavi && mAMapNavi != null) {
+                    //切换3D到2D
+                    changDimens(mAMapNaviView);
+                    
                 }
                 break;
             case R.id.person_age:
                 changBottomSheet(0);
                 break;
             case R.id.neighbor_garage:
-                changBottomSheet(1);
-                presenter.getNearGarage(myLongitude, myLatitude, 2);
+                if (!isNavi) {
+                    changBottomSheet(1);
+                    presenter.getNearGarage(myLongitude, myLatitude, 2);
+                }
                 break;
             case R.id.log_off:
                 new AlertDialog.Builder(this)
