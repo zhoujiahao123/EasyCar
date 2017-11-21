@@ -8,47 +8,46 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.gigamole.infinitecycleviewpager.HorizontalInfiniteCycleViewPager;
 import com.jacob.www.easycar.R;
 import com.jacob.www.easycar.data.GarageBean;
 
 /**
- *
  * @author ASUS-NB
  * @date 2017/11/16
  */
 
 public class MainAdapter extends PagerAdapter {
-    
+
+    private MainActivity activity;
     private LayoutInflater mLayoutInflater;
     private GarageBean bean;
-    
-    private TextView tvFreeLot,tvTotalLot,tvDesTime,tvDesKm,tvName;
-
+    private HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager;
+    private TextView tvFreeLot, tvTotalLot, tvDesTime, tvDesKm, tvName;
     private Button btnNavi;
-    public MainAdapter(Context context, GarageBean bean) {
+
+    public MainAdapter(Context context, GarageBean bean, HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager) {
+        activity = (MainActivity) context;
         mLayoutInflater = LayoutInflater.from(context);
         this.bean = bean;
-
+        this.horizontalInfiniteCycleViewPager = horizontalInfiniteCycleViewPager;
     }
-    
-    public interface onButtonItemClickListener{
-        void startNavi(double lat,double lot);
+
+    public interface onButtonItemClickListener {
+        void startNavi(double lat, double lot);
+
         void setGarageId(String id);
     }
-    public interface onDriveRouteGenerate{
-        void generate(double lat,double lot);
+
+    public interface onDriveRouteGenerate {
+        void generate();
     }
-    
-    
+
+
     private onButtonItemClickListener buttonItemClickListener;
 
     public void setButtonItemClickListener(onButtonItemClickListener buttonItemClickListener) {
         this.buttonItemClickListener = buttonItemClickListener;
-    }
-    private onDriveRouteGenerate driveRouteGenerate;
-
-    public void setDriveRouteGenerate(onDriveRouteGenerate driveRouteGenerate) {
-        this.driveRouteGenerate = driveRouteGenerate;
     }
 
     @Override
@@ -69,25 +68,25 @@ public class MainAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(final ViewGroup container, final int position) {
         final View view;
-        view = mLayoutInflater.inflate(R.layout.fragment_route,container,false);
+        view = mLayoutInflater.inflate(R.layout.fragment_route, container, false);
         tvDesKm = view.findViewById(R.id.tv_des_km);
         tvDesTime = view.findViewById(R.id.tv_des_time);
         tvFreeLot = view.findViewById(R.id.tv_des_free);
         tvTotalLot = view.findViewById(R.id.tv_des_total);
         tvName = view.findViewById(R.id.tv_des_name);
         btnNavi = view.findViewById(R.id.btn_start_navi);
-        driveRouteGenerate.generate(bean.getData().get(position).getPositionLongitude(),bean.getData().get(position).getPositionLatitude());
+        activity.getRealItem(bean.getData().get(horizontalInfiniteCycleViewPager.getRealItem()).getPositionLongitude(), bean.getData().get(horizontalInfiniteCycleViewPager.getRealItem()).getPositionLatitude());
         btnNavi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 buttonItemClickListener.setGarageId(bean.getData().get(position).getGarageId());
-                buttonItemClickListener.startNavi(bean.getData().get(position).getPositionLatitude(),bean.getData().get(position).getPositionLongitude());
-                
+                buttonItemClickListener.startNavi(bean.getData().get(position).getPositionLatitude(), bean.getData().get(position).getPositionLongitude());
+
             }
         });
         tvName.setText(bean.getData().get(position).getGarageName());
-        tvTotalLot.setText("车库总车位："+bean.getData().get(position).getParkingLotCount());
-        tvFreeLot.setText("目前剩余车位："+bean.getData().get(position).getFreeParkingLotCount());
+        tvTotalLot.setText("车库总车位：" + bean.getData().get(position).getParkingLotCount());
+        tvFreeLot.setText("目前剩余车位：" + bean.getData().get(position).getFreeParkingLotCount());
         container.addView(view);
         return view;
     }

@@ -600,6 +600,17 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager;
     GarageBean bean;
 
+    public void getRealItem(double lon, double lat) {
+        LatLonPoint mEndPoint = new LatLonPoint(lat, lon);
+        RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(
+                new LatLonPoint(myLatitude, myLongitude), mEndPoint);
+        // 第一个参数表示路径规划的起点和终点，第二个参数表示驾车模式，第三个参数表示途经点，第四个参数表示避让区域，第五个参数表示避让道路
+        RouteSearch.DriveRouteQuery query = new RouteSearch.DriveRouteQuery(fromAndTo, RouteSearch.DrivingDefault, null,
+                null, "");
+        // 异步路径规划驾车模式查询
+        mRouteSearch.calculateDriveRouteAsyn(query);
+    }
+
     @Override
     public void showGarage(GarageBean garageBean) {
         if (garageBean.getData().size() == 0) {
@@ -611,26 +622,12 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             if (horizontalInfiniteCycleViewPager.getVisibility() == View.INVISIBLE) {
                 horizontalInfiniteCycleViewPager.setVisibility(View.VISIBLE);
             }
-            MainAdapter adapter = new MainAdapter(this, garageBean);
-            //设置选择时的路径规划
-            adapter.setDriveRouteGenerate(new MainAdapter.onDriveRouteGenerate() {
-                @Override
-                public void generate(double lat, double lot) {
-                    Log.i(TAG,"路径规划");
-                    LatLonPoint mEndPoint = new LatLonPoint(lat, lot);
-                    RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(
-                            new LatLonPoint(myLatitude, myLongitude), mEndPoint);
-                    // 第一个参数表示路径规划的起点和终点，第二个参数表示驾车模式，第三个参数表示途经点，第四个参数表示避让区域，第五个参数表示避让道路
-                    RouteSearch.DriveRouteQuery query = new RouteSearch.DriveRouteQuery(fromAndTo, RouteSearch.DrivingDefault, null,
-                            null, "");
-                    // 异步路径规划驾车模式查询
-                    mRouteSearch.calculateDriveRouteAsyn(query);
-                }
-            });
+            MainAdapter adapter = new MainAdapter(this, garageBean, horizontalInfiniteCycleViewPager);
             //设置导航
             adapter.setButtonItemClickListener(new MainAdapter.onButtonItemClickListener() {
                 @Override
                 public void startNavi(double lat, double lot) {
+                    Log.i(TAG,lat+" "+lot);
                     MainActivity.this.startNavi(lat, lot);
                     //隐藏
                     mSearchView.setVisibility(View.INVISIBLE);
