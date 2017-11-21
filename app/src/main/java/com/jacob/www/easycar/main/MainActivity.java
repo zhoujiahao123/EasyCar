@@ -1,6 +1,7 @@
 package com.jacob.www.easycar.main;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -607,14 +608,15 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             presenter.getNearGarage(latLonPoint.getLongitude(), latLonPoint.getLatitude(), 2);
             desLat = latLonPoint.getLatitude();
             desLon = latLonPoint.getLongitude();
+            is = false;
             //发起请求
         }
     }
 
     double desLat, desLon;
 
-    HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager;
-    GarageBean bean;
+
+
 
     public void getRealItem(double lon, double lat) {
         LatLonPoint mEndPoint = new LatLonPoint(lat, lon);
@@ -626,36 +628,38 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         // 异步路径规划驾车模式查询
         mRouteSearch.calculateDriveRouteAsyn(query);
     }
+    boolean is = false;
+    public void calculate(double lon, double lat) {
+        is = true;
+        LatLonPoint mEndPoint = new LatLonPoint(lat, lon);
+        RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(
+                new LatLonPoint(myLatitude, myLongitude), mEndPoint);
+        // 第一个参数表示路径规划的起点和终点，第二个参数表示驾车模式，第三个参数表示途经点，第四个参数表示避让区域，第五个参数表示避让道路
+        RouteSearch.DriveRouteQuery query = new RouteSearch.DriveRouteQuery(fromAndTo, RouteSearch.DrivingDefault, null,
+                null, "");
+        // 异步路径规划驾车模式查询
+        mRouteSearch.calculateDriveRouteAsyn(query);
+    }
+
+
+    HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager;
+    GarageBean bean;
+    MainAdapter adapter;
 
     @Override
     public void showGarage(GarageBean garageBean) {
-        if (garageBean.getData().size() == 0) {
+        Log.e(TAG,"showGarage");
+        Log.e(TAG,"size"+garageBean.getData().size());
+        if(garageBean.getData().size()==0){
             Toast.makeText(this, "附近无车库", Toast.LENGTH_SHORT).show();
             startNavi(desLat, desLon);
-        } else {
+        }else {
             bean = garageBean;
-            horizontalInfiniteCycleViewPager = (HorizontalInfiniteCycleViewPager) findViewById(R.id.hicvp);
-            if (horizontalInfiniteCycleViewPager.getVisibility() == View.INVISIBLE) {
-                horizontalInfiniteCycleViewPager.setVisibility(View.VISIBLE);
+            for(int i =0;i<garageBean.getData().size();i++){
+                getRealItem(garageBean.getData().get(i).getPositionLongitude(),garageBean.getData().get(i).getPositionLatitude());
             }
-            MainAdapter adapter = new MainAdapter(this, garageBean, horizontalInfiniteCycleViewPager);
-            //设置导航
-            adapter.setButtonItemClickListener(new MainAdapter.onButtonItemClickListener() {
-                @Override
-                public void startNavi(double lat, double lot) {
-                    Log.i(TAG, lat + " " + lot);
-                    MainActivity.this.startNavi(lat, lot);
-                    //隐藏
-                    mSearchView.setVisibility(View.INVISIBLE);
-                }
-
-                @Override
-                public void setGarageId(String id) {
-                    MainActivity.this.setGarageId(id);
-                }
-            });
-            horizontalInfiniteCycleViewPager.setAdapter(adapter);
         }
+        
     }
 
 
@@ -663,7 +667,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     public void onBusRouteSearched(BusRouteResult busRouteResult, int i) {
 
     }
-
+    List<Integer> diss  = new ArrayList<>();
+    List<Integer> times = new ArrayList<>();
     @Override
     public void onDriveRouteSearched(DriveRouteResult result, int i) {
         if (i == AMapException.CODE_AMAP_SUCCESS) {
@@ -684,9 +689,51 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                     drivingRouteOverlay.removeFromMap();
                     drivingRouteOverlay.addToMap();
                     drivingRouteOverlay.zoomToSpan();
+                    int dis = (int) drivePath.getDistance();
+                    int dur = (int) drivePath.getDuration();
+                    if(!is){
+                        if(!diss.contains(dis)){
+                            diss.add(dis);
+                        }
+                        if(!times.contains(dur)){
+                            times.add(dur);
+                        }
+                        if (bean.getData().size() == 0) {
+                            Toast.makeText(this, "附近无车库", Toast.LENGTH_SHORT).show();
+                            startNavi(desLat, desLon);
+                        } else {
+                            Log.e("TAG","调用这个");
+                            if(times.size()==bean.getData().size()){
+                                Log.e("TAG",times.size()+"   -----"+bean.getData().size());
+                                horizontalInfiniteCycleViewPager = (HorizontalInfiniteCycleViewPager) findViewById(R.id.hicvp);
+                                if (horizontalInfiniteCycleViewPager.getVisibility() == View.INVISIBLE) {
+                                    horizontalInfiniteCycleViewPager.setVisibility(View.VISIBLE);
+                                }
+                                adapter = new MainAdapter(this, bean,horizontalInfiniteCycleViewPager,diss,times);
+                                horizontalInfiniteCycleViewPager.setAdapter(adapter);
+                                //设置导航
+                                adapter.setButtonItemClickListener(new MainAdapter.onButtonItemClickListener() {
+                                    @Override
+                                    public void startNavi(double lat, double lot) {
+                                        Log.i(TAG,lat+" "+lot);
+                                        MainActivity.this.startNavi(lat, lot);
+                                        //隐藏
+                                        mSearchView.setVisibility(View.INVISIBLE);
+                                    }
+
+                                    @Override
+                                    public void setGarageId(String id) {
+                                        MainActivity.this.setGarageId(id);
+                                    }
+                                });
+                            }
+                        }
+
+                    }
                 }
             }
         }
+
     }
 
     @Override

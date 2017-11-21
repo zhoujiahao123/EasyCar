@@ -12,6 +12,9 @@ import com.gigamole.infinitecycleviewpager.HorizontalInfiniteCycleViewPager;
 import com.jacob.www.easycar.R;
 import com.jacob.www.easycar.data.GarageBean;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author ASUS-NB
  * @date 2017/11/16
@@ -25,12 +28,16 @@ public class MainAdapter extends PagerAdapter {
     private HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager;
     private TextView tvFreeLot, tvTotalLot, tvDesTime, tvDesKm, tvName;
     private Button btnNavi;
+    List<Integer> diss  = new ArrayList<>();
+    List<Integer> times = new ArrayList<>();
+    public MainAdapter(Context context, GarageBean bean,HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager,List<Integer> diss,List<Integer> times) {
 
-    public MainAdapter(Context context, GarageBean bean, HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager) {
         activity = (MainActivity) context;
         mLayoutInflater = LayoutInflater.from(context);
         this.bean = bean;
         this.horizontalInfiniteCycleViewPager = horizontalInfiniteCycleViewPager;
+        this.diss = diss;
+        this.times = times;
     }
 
     public interface onButtonItemClickListener {
@@ -60,6 +67,7 @@ public class MainAdapter extends PagerAdapter {
         return POSITION_NONE;
     }
 
+
     @Override
     public Object instantiateItem(View container, int position) {
         return super.instantiateItem(container, position);
@@ -75,7 +83,7 @@ public class MainAdapter extends PagerAdapter {
         tvTotalLot = view.findViewById(R.id.tv_des_total);
         tvName = view.findViewById(R.id.tv_des_name);
         btnNavi = view.findViewById(R.id.btn_start_navi);
-        activity.getRealItem(bean.getData().get(horizontalInfiniteCycleViewPager.getRealItem()).getPositionLongitude(), bean.getData().get(horizontalInfiniteCycleViewPager.getRealItem()).getPositionLatitude());
+        activity.calculate(bean.getData().get(horizontalInfiniteCycleViewPager.getRealItem()).getPositionLongitude(),bean.getData().get(horizontalInfiniteCycleViewPager.getRealItem()).getPositionLatitude());
         btnNavi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -85,8 +93,10 @@ public class MainAdapter extends PagerAdapter {
             }
         });
         tvName.setText(bean.getData().get(position).getGarageName());
-        tvTotalLot.setText("车库总车位：" + bean.getData().get(position).getParkingLotCount());
-        tvFreeLot.setText("目前剩余车位：" + bean.getData().get(position).getFreeParkingLotCount());
+        tvTotalLot.setText("车库总车位："+bean.getData().get(position).getParkingLotCount());
+        tvFreeLot.setText("目前剩余车位："+bean.getData().get(position).getFreeParkingLotCount());
+        tvDesTime.setText("时间："+times.get(position)/60+"分钟");
+        tvDesKm.setText("距离："+((double)diss.get(position))/1000+"公里");
         container.addView(view);
         return view;
     }
