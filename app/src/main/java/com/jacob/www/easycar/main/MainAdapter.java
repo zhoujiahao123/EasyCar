@@ -89,7 +89,6 @@ public class MainAdapter extends PagerAdapter {
             public void onClick(View view) {
                 buttonItemClickListener.setGarageId(bean.getData().get(position).getGarageId());
                 buttonItemClickListener.startNavi(bean.getData().get(position).getPositionLatitude(), bean.getData().get(position).getPositionLongitude());
-
             }
         });
         tvName.setText(bean.getData().get(position).getGarageName());
