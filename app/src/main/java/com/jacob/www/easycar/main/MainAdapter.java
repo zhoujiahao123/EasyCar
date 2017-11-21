@@ -8,28 +8,47 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.amap.api.navi.model.NaviInfo;
 import com.jacob.www.easycar.R;
 import com.jacob.www.easycar.data.GarageBean;
 
 /**
- * Created by ASUS-NB on 2017/11/16.
+ *
+ * @author ASUS-NB
+ * @date 2017/11/16
  */
 
 public class MainAdapter extends PagerAdapter {
-
-    private MainActivity activity;
+    
     private LayoutInflater mLayoutInflater;
     private GarageBean bean;
-
+    
     private TextView tvFreeLot,tvTotalLot,tvDesTime,tvDesKm,tvName;
 
     private Button btnNavi;
     public MainAdapter(Context context, GarageBean bean) {
-        activity = (MainActivity) context;
         mLayoutInflater = LayoutInflater.from(context);
         this.bean = bean;
 
+    }
+    
+    public interface onButtonItemClickListener{
+        void startNavi(double lat,double lot);
+        void setGarageId(String id);
+    }
+    public interface onDriveRouteGenerate{
+        void generate(double lat,double lot);
+    }
+    
+    
+    private onButtonItemClickListener buttonItemClickListener;
+
+    public void setButtonItemClickListener(onButtonItemClickListener buttonItemClickListener) {
+        this.buttonItemClickListener = buttonItemClickListener;
+    }
+    private onDriveRouteGenerate driveRouteGenerate;
+
+    public void setDriveRouteGenerate(onDriveRouteGenerate driveRouteGenerate) {
+        this.driveRouteGenerate = driveRouteGenerate;
     }
 
     @Override
@@ -43,6 +62,11 @@ public class MainAdapter extends PagerAdapter {
     }
 
     @Override
+    public Object instantiateItem(View container, int position) {
+        return super.instantiateItem(container, position);
+    }
+
+    @Override
     public Object instantiateItem(final ViewGroup container, final int position) {
         final View view;
         view = mLayoutInflater.inflate(R.layout.fragment_route,container,false);
@@ -52,12 +76,13 @@ public class MainAdapter extends PagerAdapter {
         tvTotalLot = view.findViewById(R.id.tv_des_total);
         tvName = view.findViewById(R.id.tv_des_name);
         btnNavi = view.findViewById(R.id.btn_start_navi);
-        activity.getRealItem(bean.getData().get(position).getPositionLongitude(),bean.getData().get(position).getPositionLatitude());
+        driveRouteGenerate.generate(bean.getData().get(position).getPositionLongitude(),bean.getData().get(position).getPositionLatitude());
         btnNavi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                activity.startNavi(bean.getData().get(position).getPositionLatitude(),bean.getData().get(position).getPositionLongitude());
-                activity.setGarageId(bean.getData().get(position).getGarageId());
+                buttonItemClickListener.setGarageId(bean.getData().get(position).getGarageId());
+                buttonItemClickListener.startNavi(bean.getData().get(position).getPositionLatitude(),bean.getData().get(position).getPositionLongitude());
+                
             }
         });
         tvName.setText(bean.getData().get(position).getGarageName());

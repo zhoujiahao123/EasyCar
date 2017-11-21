@@ -55,7 +55,7 @@ public class MainModelImpl extends BaseModelImpl implements Model {
                     @Override
                     public void onError(Throwable e) {
                         Log.i("Error", e.getMessage());
-                        if (ResponseCons.HTTP400.equals(e.getMessage())) {
+                        if (ResponseCons.HTTP400.equals(e.getMessage()) || ResponseCons.HTTP404.equals(e.getMessage())) {
                             callBack.error("选择车库后，才能看到车库的详细信息哦");
                         } else {
                             callBack.error(e.getMessage());

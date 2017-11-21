@@ -9,5 +9,7 @@ public class ResponseCons {
         
         public static final String HTTP400 = "HTTP 400 ";
         
+        public static final String HTTP404="HTTP 404 ";
+        
         public static final String GARAGE_IMAGE = "http://120.77.87.78:9999/easycar/garage_map/";
 }

@@ -195,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         User user = userDao.loadAll().get(0);
         userName.setText(user.getUserName());
         phoneNum.setText("" + user.getPhoneNum());
-        carNum.setText("渝C00000");
+        carNum.setText(getString(R.string.car_num_test));
         Glide.with(this).load(ResponseCons.BASE_URL + user.getIcon()).into(personImage);
     }
 
@@ -401,6 +401,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     public void onBackPressed() {
         if (horizontalInfiniteCycleViewPager != null && horizontalInfiniteCycleViewPager.getVisibility() == View.INVISIBLE) {
             Toast.makeText(this, "已退出导航", Toast.LENGTH_SHORT).show();
+            mSearchView.setVisibility(View.VISIBLE);
             setGarageId("0");
             isNavi = false;
             mAMapNavi.stopNavi();
@@ -515,7 +516,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void showProgress() {
-        ProgressDialogUtils.getInstance().showProgress(this, "加载中...");
+        ProgressDialogUtils.getInstance().showProgress(this, getString(R.string.loading));
     }
 
     @Override
@@ -596,15 +597,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     double desLat, desLon;
 
-    public void getRealItem(double lon, double lat) {
-        LatLonPoint mEndPoint = new LatLonPoint(lat, lon);
-        RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(
-                new LatLonPoint(myLatitude, myLongitude), mEndPoint);
-        RouteSearch.DriveRouteQuery query = new RouteSearch.DriveRouteQuery(fromAndTo, RouteSearch.DrivingDefault, null,
-                null, "");// 第一个参数表示路径规划的起点和终点，第二个参数表示驾车模式，第三个参数表示途经点，第四个参数表示避让区域，第五个参数表示避让道路
-        mRouteSearch.calculateDriveRouteAsyn(query);// 异步路径规划驾车模式查询
-    }
-
     HorizontalInfiniteCycleViewPager horizontalInfiniteCycleViewPager;
     GarageBean bean;
 
@@ -620,6 +612,35 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 horizontalInfiniteCycleViewPager.setVisibility(View.VISIBLE);
             }
             MainAdapter adapter = new MainAdapter(this, garageBean);
+            //设置选择时的路径规划
+            adapter.setDriveRouteGenerate(new MainAdapter.onDriveRouteGenerate() {
+                @Override
+                public void generate(double lat, double lot) {
+                    Log.i(TAG,"路径规划");
+                    LatLonPoint mEndPoint = new LatLonPoint(lat, lot);
+                    RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(
+                            new LatLonPoint(myLatitude, myLongitude), mEndPoint);
+                    // 第一个参数表示路径规划的起点和终点，第二个参数表示驾车模式，第三个参数表示途经点，第四个参数表示避让区域，第五个参数表示避让道路
+                    RouteSearch.DriveRouteQuery query = new RouteSearch.DriveRouteQuery(fromAndTo, RouteSearch.DrivingDefault, null,
+                            null, "");
+                    // 异步路径规划驾车模式查询
+                    mRouteSearch.calculateDriveRouteAsyn(query);
+                }
+            });
+            //设置导航
+            adapter.setButtonItemClickListener(new MainAdapter.onButtonItemClickListener() {
+                @Override
+                public void startNavi(double lat, double lot) {
+                    MainActivity.this.startNavi(lat, lot);
+                    //隐藏
+                    mSearchView.setVisibility(View.INVISIBLE);
+                }
+
+                @Override
+                public void setGarageId(String id) {
+                    MainActivity.this.setGarageId(id);
+                }
+            });
             horizontalInfiniteCycleViewPager.setAdapter(adapter);
         }
     }
@@ -762,7 +783,9 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 garageImage.setFillColor(lot.toCharArray()[i] == '0' ? getColor(R.color.red) : getColor(R.color.green));
                 garageImage.setWordColor(getColor(R.color.white));
             }
-            oneLineLinear.addView(garageImage);
+            if (oneLineLinear != null) {
+                oneLineLinear.addView(garageImage);
+            }
         }
 
         new AlertDialog.Builder(this)
