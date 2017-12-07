@@ -93,6 +93,32 @@
             layout="@layout/view_normal_divider"
             ></include>
 
+        <!--用户车位-->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/SettingStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="当前停车位:"
+                />
+
+            <TextView
+                android:id="@+id/park_id"
+                style="@style/SettingStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="渝C:XXXXX"/>
+        </LinearLayout>
+
+        <include
+            layout="@layout/view_normal_divider"
+            ></include>
 
         <LinearLayout
             android:layout_width="match_parent"

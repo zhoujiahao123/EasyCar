@@ -97,6 +97,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     TextView carNum;
     @BindView(R.id.userName)
     TextView userName;
+    @BindView(R.id.park_id)
+    TextView parkId;
     private String TAG = "MainActivity";
     AMapNavi mAMapNavi;
     MainContract.Presenter presenter;
@@ -199,6 +201,12 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         userName.setText(user.getUserName());
         phoneNum.setText("" + user.getPhoneNum());
         carNum.setText(getString(R.string.car_num_test));
+        String park_id = SpUtil.getString(this,PARK_ID,"");
+        if("".equals(park_id)){
+          parkId.setText("当前未停车");  
+        }else{
+            parkId.setText(park_id+"号");
+        }
         Glide.with(this).load(ResponseCons.BASE_URL + user.getIcon()).into(personImage);
     }
 
@@ -773,7 +781,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     }
 
-    @OnClick({R.id.location, R.id.person_age, R.id.neighbor_garage, R.id.log_off, R.id.garage_info,R.id.capture})
+    @OnClick({R.id.location, R.id.person_age, R.id.neighbor_garage, R.id.log_off, R.id.garage_info, R.id.capture})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.location:
@@ -820,8 +828,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 presenter.getGarageLot(gId);
                 break;
             case R.id.capture:
-                Intent intent =  new Intent(this, CaptureActivity.class);
-                startActivityForResult(intent,1);
+                Intent intent = new Intent(this, CaptureActivity.class);
+                startActivityForResult(intent, 1);
                 break;
             default:
                 break;
@@ -830,21 +838,39 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     }
 
+    private final String PARK_ID = "park_id";
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 1){
-            if(null != data){
+        if (requestCode == 1) {
+            if (null != data) {
                 Bundle bundle = data.getExtras();
-                if (bundle == null){
+                if (bundle == null) {
                     return;
                 }
-                Log.i(TAG,bundle.toString());
-                Log.i(TAG,bundle.getString(CodeUtils.RESULT_STRING));
-                if(bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS){
-                    Toast.makeText(this,"解析成功",Toast.LENGTH_SHORT).show();
-                }else if(bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED){
-                    Toast.makeText(this,"解析失败",Toast.LENGTH_SHORT).show();
+                
+                if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
+                    String result = bundle.getString(CodeUtils.RESULT_STRING);
+                    Log.i(TAG,result+"");
+                    //拿到车位号
+                    if ("".equals(SpUtil.getString(this, PARK_ID, ""))) {
+                        Toast.makeText(this,"停车号"+result+"号",Toast.LENGTH_SHORT).show();
+                        //说明没有停车
+                        SpUtil.putString(this, PARK_ID, result);
+                        //更新ui
+                        parkId.setText(result+"号");
+                    }else if(result.equals(SpUtil.getString(this,PARK_ID,""))){
+                        Toast.makeText(this,"您已成功取消停车",Toast.LENGTH_SHORT).show();
+                        //说明已经停过车，并且扫描的是同一个二维码
+                        SpUtil.putString(this,PARK_ID,"");
+                        parkId.setText("当前未停车");
+                    }else{
+                        //说明用户扫描错误
+                        Toast.makeText(this,"当前扫描的二维码不是这个车位的二维码哦，请找到正确的二维码并重新扫描", Toast.LENGTH_SHORT).show();
+                    }
+                } else if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED) {
+                    Toast.makeText(this, "不支持该格式", Toast.LENGTH_SHORT).show();
                 }
             }
         }
