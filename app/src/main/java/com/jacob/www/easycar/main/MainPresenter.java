@@ -7,7 +7,9 @@ import com.jacob.www.easycar.data.GarageLotBean;
 import com.jacob.www.easycar.net.LoadingCallBack;
 
 /**
- * Created by ASUS-NB on 2017/11/12.
+ *
+ * @author ASUS-NB
+ * @date 2017/11/12
  */
 
 public class MainPresenter implements MainContract.Presenter {

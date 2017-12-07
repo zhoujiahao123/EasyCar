@@ -97,6 +97,16 @@
                     android:layout_height="@dimen/right_button_size"
                     android:padding="@dimen/margin_small"
                     android:src="@drawable/target_garage"/>
+                <include
+                    layout="@layout/view_normal_divider"
+                    ></include>
+
+                <ImageView
+                    android:id="@+id/capture"
+                    android:layout_width="@dimen/right_button_size"
+                    android:layout_height="@dimen/right_button_size"
+                    android:padding="@dimen/margin_small"
+                    android:src="@drawable/qr_code"/>
             </LinearLayout>
         </android.support.v7.widget.CardView>
 

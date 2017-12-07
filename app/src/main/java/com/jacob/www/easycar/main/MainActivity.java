@@ -1,6 +1,7 @@
 package com.jacob.www.easycar.main;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -72,6 +73,8 @@ import com.jacob.www.easycar.util.SpUtil;
 import com.jacob.www.easycar.util.ToActivityUtil;
 import com.jacob.www.easycar.widget.CircleImageView;
 import com.jacob.www.easycar.widget.GarageImage;
+import com.uuzuche.lib_zxing.activity.CaptureActivity;
+import com.uuzuche.lib_zxing.activity.CodeUtils;
 import com.zxr.medicalaid.User;
 import com.zxr.medicalaid.UserDao;
 
@@ -770,7 +773,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     }
 
-    @OnClick({R.id.location, R.id.person_age, R.id.neighbor_garage, R.id.log_off, R.id.garage_info})
+    @OnClick({R.id.location, R.id.person_age, R.id.neighbor_garage, R.id.log_off, R.id.garage_info,R.id.capture})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.location:
@@ -816,11 +819,35 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 //得到二进制序列
                 presenter.getGarageLot(gId);
                 break;
+            case R.id.capture:
+                Intent intent =  new Intent(this, CaptureActivity.class);
+                startActivityForResult(intent,1);
+                break;
             default:
                 break;
 
         }
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 1){
+            if(null != data){
+                Bundle bundle = data.getExtras();
+                if (bundle == null){
+                    return;
+                }
+                Log.i(TAG,bundle.toString());
+                Log.i(TAG,bundle.getString(CodeUtils.RESULT_STRING));
+                if(bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS){
+                    Toast.makeText(this,"解析成功",Toast.LENGTH_SHORT).show();
+                }else if(bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED){
+                    Toast.makeText(this,"解析失败",Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
     }
 
     private void changBottomSheet(int i) {
