@@ -201,11 +201,11 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         userName.setText(user.getUserName());
         phoneNum.setText("" + user.getPhoneNum());
         carNum.setText(getString(R.string.car_num_test));
-        String park_id = SpUtil.getString(this,PARK_ID,"");
-        if("".equals(park_id)){
-          parkId.setText("当前未停车");  
-        }else{
-            parkId.setText(park_id+"号");
+        String park_id = SpUtil.getString(this, PARK_ID, "");
+        if ("".equals(park_id)) {
+            parkId.setText("当前未停车");
+        } else {
+            parkId.setText(park_id + "号");
         }
         Glide.with(this).load(ResponseCons.BASE_URL + user.getIcon()).into(personImage);
     }
@@ -849,25 +849,25 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 if (bundle == null) {
                     return;
                 }
-                
+
                 if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
                     String result = bundle.getString(CodeUtils.RESULT_STRING);
-                    Log.i(TAG,result+"");
+                    Log.i(TAG, result + "");
                     //拿到车位号
                     if ("".equals(SpUtil.getString(this, PARK_ID, ""))) {
-                        Toast.makeText(this,"停车号"+result+"号",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "停车号" + result + "号", Toast.LENGTH_SHORT).show();
                         //说明没有停车
                         SpUtil.putString(this, PARK_ID, result);
                         //更新ui
-                        parkId.setText(result+"号");
-                    }else if(result.equals(SpUtil.getString(this,PARK_ID,""))){
-                        Toast.makeText(this,"您已成功取消停车",Toast.LENGTH_SHORT).show();
+                        parkId.setText(result + "号");
+                    } else if (result.equals(SpUtil.getString(this, PARK_ID, ""))) {
+                        Toast.makeText(this, "您已成功取消停车", Toast.LENGTH_SHORT).show();
                         //说明已经停过车，并且扫描的是同一个二维码
-                        SpUtil.putString(this,PARK_ID,"");
+                        SpUtil.putString(this, PARK_ID, "");
                         parkId.setText("当前未停车");
-                    }else{
+                    } else {
                         //说明用户扫描错误
-                        Toast.makeText(this,"当前扫描的二维码不是这个车位的二维码哦，请找到正确的二维码并重新扫描", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "当前扫描的二维码不是这个车位的二维码哦，请找到正确的二维码并重新扫描", Toast.LENGTH_SHORT).show();
                     }
                 } else if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED) {
                     Toast.makeText(this, "不支持该格式", Toast.LENGTH_SHORT).show();
