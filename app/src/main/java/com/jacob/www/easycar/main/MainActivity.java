@@ -73,11 +73,12 @@ import com.jacob.www.easycar.util.SpUtil;
 import com.jacob.www.easycar.util.ToActivityUtil;
 import com.jacob.www.easycar.widget.CircleImageView;
 import com.jacob.www.easycar.widget.GarageImage;
+import com.uuzuche.lib_zxing.activity.CaptureActivity;
+import com.uuzuche.lib_zxing.activity.CodeUtils;
 import com.zxr.medicalaid.User;
 import com.zxr.medicalaid.UserDao;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
@@ -96,6 +97,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     TextView carNum;
     @BindView(R.id.userName)
     TextView userName;
+    @BindView(R.id.park_id)
+    TextView parkId;
     private String TAG = "MainActivity";
     AMapNavi mAMapNavi;
     MainContract.Presenter presenter;
@@ -198,6 +201,12 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         userName.setText(user.getUserName());
         phoneNum.setText("" + user.getPhoneNum());
         carNum.setText(getString(R.string.car_num_test));
+        String park_id = SpUtil.getString(this, PARK_ID, "");
+        if ("".equals(park_id)) {
+            parkId.setText("当前未停车");
+        } else {
+            parkId.setText(park_id + "号");
+        }
         Glide.with(this).load(ResponseCons.BASE_URL + user.getIcon()).into(personImage);
     }
 
@@ -224,9 +233,25 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         mAMapNaviView.setAMapNaviViewListener(this);
         AMapNaviViewOptions options = mAMapNaviView.getViewOptions();
         options.setLayoutVisible(false);
+        options.setTilt(45);
         mAMapNaviView.setViewOptions(options);
         onInitNaviSuccess();
     }
+
+    int dimens = 3;
+
+    private void changDimens(AMapNaviView mAMapNaviView) {
+        AMapNaviViewOptions options = mAMapNaviView.getViewOptions();
+        if (dimens == 2) {
+            options.setTilt(0);
+            dimens = 3;
+        } else if (dimens == 3) {
+            options.setTilt(45);
+            dimens = 2;
+        }
+        mAMapNaviView.setViewOptions(options);
+    }
+
 
     @Override
     public void onMyLocationChange(Location location) {
@@ -344,15 +369,11 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
     private NaviInfo naviInfo;
-    boolean isShow = true;
+
     @Override
     public void onNaviInfoUpdate(NaviInfo naviInfo) {
         this.naviInfo = naviInfo;
         Log.e(TAG, naviInfo.getPathRetainDistance() + "      " + naviInfo.getPathRetainTime());
-        if(naviInfo.getPathRetainDistance()<100&&isShow){
-            presenter.getGarageLot(gId);
-            isShow = false;
-        }
     }
 
     @Override
@@ -397,7 +418,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         if (horizontalInfiniteCycleViewPager != null && horizontalInfiniteCycleViewPager.getVisibility() == View.VISIBLE) {
             horizontalInfiniteCycleViewPager.setVisibility(View.INVISIBLE);
         }
-        mAMapNavi.startNavi(NaviType.EMULATOR);
+        mAMapNavi.startNavi(NaviType.GPS);
         isNavi = true;
     }
 
@@ -405,7 +426,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void onBackPressed() {
-        isShow  = true;
         if (horizontalInfiniteCycleViewPager != null && horizontalInfiniteCycleViewPager.getVisibility() == View.INVISIBLE) {
             Toast.makeText(this, "已退出导航", Toast.LENGTH_SHORT).show();
             mSearchView.setVisibility(View.VISIBLE);
@@ -607,8 +627,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     double desLat, desLon;
 
 
-
-
     public void getRealItem(double lon, double lat) {
         LatLonPoint mEndPoint = new LatLonPoint(lat, lon);
         RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(
@@ -619,16 +637,20 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         // 异步路径规划驾车模式查询
         mRouteSearch.calculateDriveRouteAsyn(query);
     }
+
     boolean is = false;
     boolean iis = false;
+
     public void calculate(double lon, double lat) {
         is = true;
         LatLonPoint mEndPoint = new LatLonPoint(lat, lon);
         RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(
                 new LatLonPoint(myLatitude, myLongitude), mEndPoint);
+        // 第一个参数表示路径规划的起点和终点，第二个参数表示驾车模式，第三个参数表示途经点，第四个参数表示避让区域，第五个参数表示避让道路
         RouteSearch.DriveRouteQuery query = new RouteSearch.DriveRouteQuery(fromAndTo, RouteSearch.DrivingDefault, null,
-                null, "");// 第一个参数表示路径规划的起点和终点，第二个参数表示驾车模式，第三个参数表示途经点，第四个参数表示避让区域，第五个参数表示避让道路
-        mRouteSearch.calculateDriveRouteAsyn(query);// 异步路径规划驾车模式查询
+                null, "");
+        // 异步路径规划驾车模式查询
+        mRouteSearch.calculateDriveRouteAsyn(query);
     }
 
 
@@ -638,30 +660,18 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void showGarage(GarageBean garageBean) {
-        Log.e(TAG,"showGarage");
-        Log.e(TAG,"size"+garageBean.getData().size());
-        if(garageBean.getData().size()==0){
+        Log.e(TAG, "showGarage");
+        Log.e(TAG, "size" + garageBean.getData().size());
+        if (garageBean.getData().size() == 0) {
             Toast.makeText(this, "附近无车库", Toast.LENGTH_SHORT).show();
             startNavi(desLat, desLon);
-        }else {
+        } else {
             bean = garageBean;
-            for(int i =0;i<garageBean.getData().size();i++){
-                getRealItem(garageBean.getData().get(i).getPositionLongitude(),garageBean.getData().get(i).getPositionLatitude());
+            for (int i = 0; i < garageBean.getData().size(); i++) {
+                getRealItem(garageBean.getData().get(i).getPositionLongitude(), garageBean.getData().get(i).getPositionLatitude());
             }
         }
 
-//        if (garageBean.getData().size() == 0) {
-//            Toast.makeText(this, "附近无车库", Toast.LENGTH_SHORT).show();
-//            startNavi(desLat, desLon);
-//        } else {
-//            bean = garageBean;
-//            horizontalInfiniteCycleViewPager = (HorizontalInfiniteCycleViewPager) findViewById(R.id.hicvp);
-//            if (horizontalInfiniteCycleViewPager.getVisibility() == View.INVISIBLE) {
-//                horizontalInfiniteCycleViewPager.setVisibility(View.VISIBLE);
-//            }
-//            adapter = new MainAdapter(this, garageBean,horizontalInfiniteCycleViewPager);
-//            horizontalInfiniteCycleViewPager.setAdapter(adapter);
-//        }
     }
 
 
@@ -669,8 +679,10 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     public void onBusRouteSearched(BusRouteResult busRouteResult, int i) {
 
     }
-    List<Integer> diss  = new ArrayList<>();
+
+    List<Integer> diss = new ArrayList<>();
     List<Integer> times = new ArrayList<>();
+
     @Override
     public void onDriveRouteSearched(DriveRouteResult result, int i) {
         if (i == AMapException.CODE_AMAP_SUCCESS) {
@@ -685,17 +697,17 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                             mDriveRouteResult.getStartPos(),
                             mDriveRouteResult.getTargetPos(), null);
                     //设置节点marker是否显示
-//                    drivingRouteOverlay.setNodeIconVisibility(false);
-//                    //是否用颜色展示交通拥堵情况，默认true
-//                    drivingRouteOverlay.setIsColorfulline(true);
-//                    drivingRouteOverlay.removeFromMap();
-//                    drivingRouteOverlay.addToMap();
-//                    drivingRouteOverlay.zoomToSpan();
+                    //                    drivingRouteOverlay.setNodeIconVisibility(false);
+                    //                    //是否用颜色展示交通拥堵情况，默认true
+                    //                    drivingRouteOverlay.setIsColorfulline(true);
+                    //                    drivingRouteOverlay.removeFromMap();
+                    //                    drivingRouteOverlay.addToMap();
+                    //                    drivingRouteOverlay.zoomToSpan();
                     int dis = (int) drivePath.getDistance();
                     int dur = (int) drivePath.getDuration();
-                    Log.e("TAG","外面层显示了");
-                    if(iis){
-                        Log.e("TAG","内面层显示了");
+                    Log.e("TAG", "外面层显示了");
+                    if (iis) {
+                        Log.e("TAG", "内面层显示了");
                         drivingRouteOverlay.setNodeIconVisibility(false);
                         //是否用颜色展示交通拥堵情况，默认true
                         drivingRouteOverlay.setIsColorfulline(true);
@@ -703,42 +715,42 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                         drivingRouteOverlay.addToMap();
                         drivingRouteOverlay.zoomToSpan();
                     }
-                    if(!is){
+                    if (!is) {
 
-                        if(!diss.contains(dis)){
+                        if (!diss.contains(dis)) {
                             diss.add(dis);
                         }
-                        if(!times.contains(dur)){
+                        if (!times.contains(dur)) {
                             times.add(dur);
                         }
                         if (bean.getData().size() == 0) {
                             Toast.makeText(this, "附近无车库", Toast.LENGTH_SHORT).show();
                             startNavi(desLat, desLon);
                         } else {
-                            Log.e("TAG","调用这个");
-                            Log.e("TAG",times.size()+"   -----"+bean.getData().size());
-                            if(times.size()==bean.getData().size()){
-                                iis =true;
-                                Log.e("TAG",times.size()+"   -----"+bean.getData().size());
+                            Log.e("TAG", "调用这个");
+                            Log.e("TAG", times.size() + "   -----" + bean.getData().size());
+                            if (times.size() == bean.getData().size()) {
+                                iis = true;
+                                Log.e("TAG", times.size() + "   -----" + bean.getData().size());
                                 horizontalInfiniteCycleViewPager = (HorizontalInfiniteCycleViewPager) findViewById(R.id.hicvp);
                                 if (horizontalInfiniteCycleViewPager.getVisibility() == View.INVISIBLE) {
                                     horizontalInfiniteCycleViewPager.setVisibility(View.VISIBLE);
                                 }
-                                List<Integer> diss2  = new ArrayList<>();
+                                List<Integer> diss2 = new ArrayList<>();
                                 List<Integer> times2 = new ArrayList<>();
                                 diss2.addAll(diss);
                                 times2.addAll(times);
-                                adapter = new MainAdapter(this, bean,horizontalInfiniteCycleViewPager,diss2,times2);
+                                adapter = new MainAdapter(this, bean, horizontalInfiniteCycleViewPager, diss2, times2);
                                 diss.clear();
                                 times.clear();
-                                Log.e("TAG,他的大小是",diss.size()+"---"+ times.size());
+                                Log.e("TAG,他的大小是", diss.size() + "---" + times.size());
                                 horizontalInfiniteCycleViewPager.setAdapter(adapter);
 
                                 //设置导航
                                 adapter.setButtonItemClickListener(new MainAdapter.onButtonItemClickListener() {
                                     @Override
                                     public void startNavi(double lat, double lot) {
-                                        Log.i(TAG,lat+" "+lot);
+                                        Log.i(TAG, lat + " " + lot);
                                         MainActivity.this.startNavi(lat, lot);
                                         //隐藏
                                         mSearchView.setVisibility(View.INVISIBLE);
@@ -769,21 +781,27 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     }
 
-    @OnClick({R.id.location, R.id.person_age, R.id.neighbor_garage, R.id.log_off, R.id.garage_info})
+    @OnClick({R.id.location, R.id.person_age, R.id.neighbor_garage, R.id.log_off, R.id.garage_info, R.id.capture})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.location:
-                if (myLatitude != 0) {
+                if (myLatitude != 0 && !isNavi) {
                     aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(myLatitude, myLongitude), nowZoom));
+                } else if (isNavi && mAMapNavi != null) {
+                    //切换3D到2D
+                    changDimens(mAMapNaviView);
+
                 }
                 break;
             case R.id.person_age:
                 changBottomSheet(0);
                 break;
             case R.id.neighbor_garage:
-                is = false;
-                changBottomSheet(1);
-                presenter.getNearGarage(myLongitude, myLatitude, 2);
+                if (!isNavi) {
+                    is = false;
+                    changBottomSheet(1);
+                    presenter.getNearGarage(myLongitude, myLatitude, 2);
+                }
                 break;
             case R.id.log_off:
                 new AlertDialog.Builder(this)
@@ -809,11 +827,53 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 //得到二进制序列
                 presenter.getGarageLot(gId);
                 break;
+            case R.id.capture:
+                Intent intent = new Intent(this, CaptureActivity.class);
+                startActivityForResult(intent, 1);
+                break;
             default:
                 break;
 
         }
 
+    }
+
+    private final String PARK_ID = "park_id";
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if (null != data) {
+                Bundle bundle = data.getExtras();
+                if (bundle == null) {
+                    return;
+                }
+
+                if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
+                    String result = bundle.getString(CodeUtils.RESULT_STRING);
+                    Log.i(TAG, result + "");
+                    //拿到车位号
+                    if ("".equals(SpUtil.getString(this, PARK_ID, ""))) {
+                        Toast.makeText(this, "停车号" + result + "号", Toast.LENGTH_SHORT).show();
+                        //说明没有停车
+                        SpUtil.putString(this, PARK_ID, result);
+                        //更新ui
+                        parkId.setText(result + "号");
+                    } else if (result.equals(SpUtil.getString(this, PARK_ID, ""))) {
+                        Toast.makeText(this, "您已成功取消停车", Toast.LENGTH_SHORT).show();
+                        //说明已经停过车，并且扫描的是同一个二维码
+                        SpUtil.putString(this, PARK_ID, "");
+                        parkId.setText("当前未停车");
+                    } else {
+                        //说明用户扫描错误
+                        Toast.makeText(this, "当前扫描的二维码不是这个车位的二维码哦，请找到正确的二维码并重新扫描", Toast.LENGTH_SHORT).show();
+                    }
+                } else if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED) {
+                    Toast.makeText(this, "不支持该格式", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
     }
 
     private void changBottomSheet(int i) {
@@ -898,7 +958,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-
                         dialogInterface.dismiss();
                     }
                 })

@@ -45,10 +45,7 @@ public class MainAdapter extends PagerAdapter {
 
         void setGarageId(String id);
     }
-
-    public interface onDriveRouteGenerate {
-        void generate();
-    }
+    
 
 
     private onButtonItemClickListener buttonItemClickListener;

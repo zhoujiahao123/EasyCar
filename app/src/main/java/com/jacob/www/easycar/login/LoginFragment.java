@@ -2,6 +2,7 @@ package com.jacob.www.easycar.login;
 
 import android.Manifest;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
@@ -77,9 +78,11 @@ public class LoginFragment extends BaseFragment implements LogInContract.View {
     
     private void getPermissions(){
         LoginFragmentPermissionsDispatcher.locationNeedsWithCheck(this);
+        Log.i(TAG,"fff");
+        
     }
-
-    @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+    
+    @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.CAMERA})
     void locationNeeds() {
         
     }
