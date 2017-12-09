@@ -26,6 +26,7 @@
 
 
     <style name="SettingStyle">
+        <item name="android:textSize">@dimen/font_normal</item>
         <item name="android:padding">@dimen/margin_normal</item>
         <item name="android:textColor">@color/dark_gray</item>
     </style>

@@ -68,4 +68,9 @@ public class MainModelImpl extends BaseModelImpl implements Model {
                     }
                 });
     }
+
+    @Override
+    public void changeInfo(String uId, String type, String value, LoadingCallBack callBack) {
+        httpRequest(api.changUserInfo(uId,type,value),callBack);
+    }
 }

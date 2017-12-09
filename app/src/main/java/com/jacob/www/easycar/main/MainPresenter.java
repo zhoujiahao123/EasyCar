@@ -2,12 +2,15 @@ package com.jacob.www.easycar.main;
 
 import android.util.Log;
 
+import com.jacob.www.easycar.base.App;
 import com.jacob.www.easycar.data.GarageBean;
 import com.jacob.www.easycar.data.GarageLotBean;
+import com.jacob.www.easycar.data.UserBean;
 import com.jacob.www.easycar.net.LoadingCallBack;
+import com.zxr.medicalaid.User;
+import com.zxr.medicalaid.UserDao;
 
 /**
- *
  * @author ASUS-NB
  * @date 2017/11/12
  */
@@ -15,6 +18,7 @@ import com.jacob.www.easycar.net.LoadingCallBack;
 public class MainPresenter implements MainContract.Presenter {
     Model model = new MainModelImpl();
     MainContract.View view;
+    UserDao userDao = App.getDaoSession().getUserDao();
 
     public MainPresenter(MainContract.View view) {
         this.view = view;
@@ -60,6 +64,30 @@ public class MainPresenter implements MainContract.Presenter {
             public void error(String msg) {
                 view.showMsg(msg);
                 view.hideProgress();
+            }
+        });
+    }
+
+    @Override
+    public void changeInfo(String uId, String type, String value) {
+        view.showProgress();
+        model.changeInfo(uId, type, value, new LoadingCallBack<UserBean>() {
+            @Override
+            public void loaded(UserBean data) {
+                view.hideProgress();
+                //数据处理
+                view.changeSuccess();
+                User user = userDao.loadAll().get(0);
+                user.setPhoneNum(data.getPhone());
+                user.setUId(data.getUid());
+                user.setUserName(data.getUsername());
+                userDao.update(user);
+            }
+
+            @Override
+            public void error(String msg) {
+                view.hideProgress();
+                view.showMsg(msg);
             }
         });
     }

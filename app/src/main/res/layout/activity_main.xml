@@ -147,10 +147,12 @@
                 android:layout_height="@dimen/image_size_normal"
                 android:layout_gravity="center"
                 android:src="@drawable/person_image"/>
-
-            <include
-                layout="@layout/setting_view"
-                ></include>
+            <FrameLayout
+                android:id="@+id/setting_frame_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                
+            </FrameLayout>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 
