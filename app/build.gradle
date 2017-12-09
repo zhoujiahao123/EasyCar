@@ -6,6 +6,12 @@ android {
             storeFile file('D:/Android Project/zxr.jks')
             storePassword '123456'
         }
+        ZJHconfig {
+            keyAlias 'last'
+            keyPassword '659996520..'
+            storeFile file('D:/github/key/last.jks')
+            storePassword '659996520..'
+        }
     }
     compileSdkVersion 26
     buildToolsVersion "26.0.1"
@@ -22,6 +28,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             debuggable true
+            signingConfig signingConfigs.ZJHconfig
+        }
+        debug {
+            signingConfig signingConfigs.ZJHconfig
         }
     }
     sourceSets {
