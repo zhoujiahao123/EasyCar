@@ -1,11 +1,15 @@
 package com.jacob.www.easycar.main;
 
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -13,9 +17,9 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amap.api.maps.AMap;
@@ -62,15 +66,14 @@ import com.bumptech.glide.Glide;
 import com.gigamole.infinitecycleviewpager.HorizontalInfiniteCycleViewPager;
 import com.jacob.www.easycar.R;
 import com.jacob.www.easycar.base.App;
+import com.jacob.www.easycar.data.ChangeFragment;
 import com.jacob.www.easycar.data.GarageBean;
 import com.jacob.www.easycar.data.SearchSuggestionItem;
-import com.jacob.www.easycar.login.LogInActivity;
 import com.jacob.www.easycar.net.ResponseCons;
 import com.jacob.www.easycar.overlay.DrivingRouteOverlay;
 import com.jacob.www.easycar.util.DisplayUtil;
 import com.jacob.www.easycar.util.ProgressDialogUtils;
-import com.jacob.www.easycar.util.SpUtil;
-import com.jacob.www.easycar.util.ToActivityUtil;
+import com.jacob.www.easycar.util.RxBus;
 import com.jacob.www.easycar.widget.CircleImageView;
 import com.jacob.www.easycar.widget.GarageImage;
 import com.uuzuche.lib_zxing.activity.CaptureActivity;
@@ -84,6 +87,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.functions.Action1;
 
 /**
  * @author 周家豪
@@ -91,14 +95,19 @@ import butterknife.OnClick;
 public class MainActivity extends AppCompatActivity implements MainContract.View, AMapNaviListener, AMapNaviViewListener, AMap.OnMyLocationChangeListener, FloatingSearchView.OnQueryChangeListener, FloatingSearchView.OnSearchListener, Inputtips.InputtipsListener, GeocodeSearch.OnGeocodeSearchListener, RouteSearch.OnRouteSearchListener {
     @BindView(R.id.person_image)
     CircleImageView personImage;
-    @BindView(R.id.phone_num)
-    TextView phoneNum;
-    @BindView(R.id.car_num)
-    TextView carNum;
-    @BindView(R.id.userName)
-    TextView userName;
-    @BindView(R.id.park_id)
-    TextView parkId;
+    @BindView(R.id.setting_frame_layout)
+    FrameLayout settingFrameLayout;
+
+    //初始化setting
+    /**
+     * currentFragment
+     * 0:settingFragment
+     * 1:settingChangFragment
+     */
+
+    private int flag = 0;
+    Fragment settingFragment = new SettingFragment();
+    Fragment settingChangeFragment = new SettingChangFragment();
     private String TAG = "MainActivity";
     AMapNavi mAMapNavi;
     MainContract.Presenter presenter;
@@ -153,7 +162,17 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         presenter = new MainPresenter(this);
 
         initView(savedInstanceState);
+        initRxBus();
+    }
 
+    private void initRxBus() {
+        RxBus.getDefault().toObservable(ChangeFragment.class)
+                .subscribe(new Action1<ChangeFragment>() {
+                    @Override
+                    public void call(ChangeFragment changeFragment) {
+                        MainActivity.this.changFragment(settingChangeFragment, settingFragment);
+                    }
+                });
     }
 
 
@@ -195,19 +214,25 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         mRouteSearch = new RouteSearch(this);
         mRouteSearch.setRouteSearchListener(this);
 
-        //用戶信息
+
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ta = fm.beginTransaction();
+        ta.add(R.id.setting_frame_layout, settingFragment).add(R.id.setting_frame_layout, settingChangeFragment);
+        ta.hide(settingChangeFragment).show(settingFragment);
+        ta.commit();
+
         UserDao userDao = App.getDaoSession().getUserDao();
         User user = userDao.loadAll().get(0);
-        userName.setText(user.getUserName());
-        phoneNum.setText("" + user.getPhoneNum());
-        carNum.setText(getString(R.string.car_num_test));
-        String park_id = SpUtil.getString(this, PARK_ID, "");
-        if ("".equals(park_id)) {
-            parkId.setText("当前未停车");
-        } else {
-            parkId.setText(park_id + "号");
+        if (null != user) {
+            Glide.with(this).load(ResponseCons.BASE_URL + user.getIcon()).into(personImage);
         }
-        Glide.with(this).load(ResponseCons.BASE_URL + user.getIcon()).into(personImage);
+
+    }
+
+    private void changFragment(Fragment fromFragment, Fragment toFragment) {
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ta = fm.beginTransaction();
+        ta.hide(fromFragment).show(toFragment).commit();
     }
 
     /**
@@ -781,7 +806,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     }
 
-    @OnClick({R.id.location, R.id.person_age, R.id.neighbor_garage, R.id.log_off, R.id.garage_info, R.id.capture})
+    @OnClick({R.id.location, R.id.person_age, R.id.person_image, R.id.neighbor_garage, R.id.garage_info, R.id.capture})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.location:
@@ -795,6 +820,19 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 break;
             case R.id.person_age:
                 changBottomSheet(0);
+                if (flag == 1) {
+                    changFragment(settingChangeFragment, settingFragment);
+                    flag = 0;
+                }
+                break;
+            case R.id.person_image:
+                if (flag == 0) {
+                    changFragment(settingFragment, settingChangeFragment);
+                    flag = 1;
+                } else if (flag == 1) {
+                    changFragment(settingChangeFragment, settingFragment);
+                    flag = 0;
+                }
                 break;
             case R.id.neighbor_garage:
                 if (!isNavi) {
@@ -802,26 +840,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                     changBottomSheet(1);
                     presenter.getNearGarage(myLongitude, myLatitude, 2);
                 }
-                break;
-            case R.id.log_off:
-                new AlertDialog.Builder(this)
-                        .setTitle("提示")
-                        .setMessage("您确定要退出吗")
-                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                                SpUtil.putBoolean(MainActivity.this, "has_login", false);
-                                App.getDaoSession().getUserDao().deleteAll();
-                                ToActivityUtil.toNextActivityAndFinish(MainActivity.this, LogInActivity.class);
-                            }
-                        })
-                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                            }
-                        }).show();
                 break;
             case R.id.garage_info:
                 //得到二进制序列
@@ -838,7 +856,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     }
 
-    private final String PARK_ID = "park_id";
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -849,26 +866,9 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 if (bundle == null) {
                     return;
                 }
-
                 if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
                     String result = bundle.getString(CodeUtils.RESULT_STRING);
-                    Log.i(TAG, result + "");
-                    //拿到车位号
-                    if ("".equals(SpUtil.getString(this, PARK_ID, ""))) {
-                        Toast.makeText(this, "停车号" + result + "号", Toast.LENGTH_SHORT).show();
-                        //说明没有停车
-                        SpUtil.putString(this, PARK_ID, result);
-                        //更新ui
-                        parkId.setText(result + "号");
-                    } else if (result.equals(SpUtil.getString(this, PARK_ID, ""))) {
-                        Toast.makeText(this, "您已成功取消停车", Toast.LENGTH_SHORT).show();
-                        //说明已经停过车，并且扫描的是同一个二维码
-                        SpUtil.putString(this, PARK_ID, "");
-                        parkId.setText("当前未停车");
-                    } else {
-                        //说明用户扫描错误
-                        Toast.makeText(this, "当前扫描的二维码不是这个车位的二维码哦，请找到正确的二维码并重新扫描", Toast.LENGTH_SHORT).show();
-                    }
+                    RxBus.getDefault().post(result);
                 } else if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED) {
                     Toast.makeText(this, "不支持该格式", Toast.LENGTH_SHORT).show();
                 }
@@ -962,6 +962,11 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                     }
                 })
                 .show();
+    }
+
+    @Override
+    public void changeSuccess() {
+
     }
 
 }

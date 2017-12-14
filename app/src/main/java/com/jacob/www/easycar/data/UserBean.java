@@ -1,32 +1,33 @@
 package com.jacob.www.easycar.data;
 
+import java.util.List;
+
 /**
  * Created by ASUS-NB on 2017/11/12.
  */
 
 public class UserBean {
 
-    private String username;
+    /**
+     * icon : string
+     * phone : string
+     * plateNumberInfo : ["string"]
+     * uid : string
+     * username : string
+     */
+
+    private String icon;
     private String phone;
     private String uid;
-    private String icon;
+    private String username;
+    private List<String> plateNumberInfo;
 
-    @Override
-    public String toString() {
-        return "UserBean{" +
-                "username='" + username + '\'' +
-                ", phone='" + phone + '\'' +
-                ", uid='" + uid + '\'' +
-                ", icon='" + icon + '\'' +
-                '}';
+    public String getIcon() {
+        return icon;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 
     public String getPhone() {
@@ -45,11 +46,19 @@ public class UserBean {
         this.uid = uid;
     }
 
-    public String getIcon() {
-        return icon;
+    public String getUsername() {
+        return username;
     }
 
-    public void setIcon(String icon) {
-        this.icon = icon;
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public List<String> getPlateNumberInfo() {
+        return plateNumberInfo;
+    }
+
+    public void setPlateNumberInfo(List<String> plateNumberInfo) {
+        this.plateNumberInfo = plateNumberInfo;
     }
 }

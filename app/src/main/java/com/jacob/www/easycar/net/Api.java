@@ -9,6 +9,8 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 import rx.Observable;
 
@@ -32,4 +34,8 @@ public interface Api {
 
     @GET("garage")
     Observable<GarageLotBean> getGarageLot(@Query("garageId")String garageId);
+    
+    @FormUrlEncoded
+    @PUT("user/{uid}")
+    Observable<Data<UserBean>> changUserInfo(@Path("uid") String uId,@Field("type") String type,@Field("value") String value);
 }
