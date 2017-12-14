@@ -5,11 +5,11 @@ import android.util.Log;
 import com.jacob.www.easycar.base.App;
 import com.jacob.www.easycar.data.GarageBean;
 import com.jacob.www.easycar.data.GarageLotBean;
-import com.jacob.www.easycar.data.UserBean;
+import com.jacob.www.easycar.data.User;
 import com.jacob.www.easycar.data.UserParkVO;
+import com.jacob.www.easycar.greendao.UserDao;
 import com.jacob.www.easycar.net.LoadingCallBack;
-import com.zxr.medicalaid.User;
-import com.zxr.medicalaid.UserDao;
+
 
 /**
  * @author ASUS-NB
@@ -72,16 +72,16 @@ public class MainPresenter implements MainContract.Presenter {
     @Override
     public void changeInfo(String uId, String type, String value) {
         view.showProgress();
-        model.changeInfo(uId, type, value, new LoadingCallBack<UserBean>() {
+        model.changeInfo(uId, type, value, new LoadingCallBack<User>() {
             @Override
-            public void loaded(UserBean data) {
+            public void loaded(User data) {
                 view.hideProgress();
                 //数据处理
                 view.changeSuccess();
                 User user = userDao.loadAll().get(0);
-                user.setPhoneNum(data.getPhone());
-                user.setUId(data.getUid());
-                user.setUserName(data.getUsername());
+                user.setPhone(data.getPhone());
+                user.setUid(data.getUid());
+                user.setUsername(data.getUsername());
                 userDao.update(user);
             }
 

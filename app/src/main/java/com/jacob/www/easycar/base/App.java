@@ -5,9 +5,9 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.facebook.stetho.Stetho;
+import com.jacob.www.easycar.greendao.DaoMaster;
+import com.jacob.www.easycar.greendao.DaoSession;
 import com.uuzuche.lib_zxing.activity.ZXingLibrary;
-import com.zxr.medicalaid.DaoMaster;
-import com.zxr.medicalaid.DaoSession;
 
 /**
  * Created by ASUS-NB on 2017/11/18.

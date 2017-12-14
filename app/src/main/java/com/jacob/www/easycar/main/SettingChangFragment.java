@@ -8,10 +8,10 @@ import com.jacob.www.easycar.base.App;
 import com.jacob.www.easycar.base.BaseFragment;
 import com.jacob.www.easycar.data.ChangeFragment;
 import com.jacob.www.easycar.data.GarageBean;
+import com.jacob.www.easycar.data.User;
+import com.jacob.www.easycar.greendao.UserDao;
 import com.jacob.www.easycar.net.ResponseCons;
 import com.jacob.www.easycar.util.RxBus;
-import com.zxr.medicalaid.User;
-import com.zxr.medicalaid.UserDao;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -52,10 +52,9 @@ public class SettingChangFragment extends BaseFragment implements MainContract.V
 
         UserDao userDao = App.getDaoSession().getUserDao();
         user = userDao.loadAll().get(0);
-        userName.setText(user.getUserName());
-//        carNum.setText();
+        userName.setText(user.getUsername());
         if (null != user) {
-            uId = user.getUId();
+            uId = user.getUid();
         }
     }
 
