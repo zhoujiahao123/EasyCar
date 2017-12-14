@@ -62,7 +62,7 @@ public class SettingFragment extends BaseFragment implements MainContract.View {
         user = userDao.loadAll().get(0);
         userName.setText(user.getUsername());
         phoneNum.setText("" + user.getPhone());
-        carNum.setText(getString(R.string.car_num_test));
+        carNum.setText(null == user.getPlateNums() ? "当前未绑定车牌号" : user.getPlateNums());
         String park_id = SpUtil.getString(getContext(), PARK_ID, "");
         if ("".equals(park_id)) {
             parkIdTv.setText("当前未停车");

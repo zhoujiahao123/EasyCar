@@ -78,10 +78,16 @@ public class MainPresenter implements MainContract.Presenter {
                 view.hideProgress();
                 //数据处理
                 view.changeSuccess();
+                //更新数据库
+                UserDao userDao = App.getDaoSession().getUserDao();
                 User user = userDao.loadAll().get(0);
-                user.setPhone(data.getPhone());
-                user.setUid(data.getUid());
                 user.setUsername(data.getUsername());
+                String plateNums = "";
+                for (int i = 0; i < data.getPlateNumberInfo().size(); i++) {
+                    plateNums += data.getPlateNumberInfo().get(i) + ";";
+                }
+                plateNums = plateNums.substring(0, plateNums.length() - 1);
+                user.setPlateNums(plateNums);
                 userDao.update(user);
             }
 

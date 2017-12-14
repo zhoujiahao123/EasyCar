@@ -15,7 +15,6 @@ import com.jacob.www.easycar.util.RxBus;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 
 /**
  * Created by 张兴锐 on 2017/12/9.
@@ -32,7 +31,7 @@ public class SettingChangFragment extends BaseFragment implements MainContract.V
     EditText carNum;
     String uId;
     User user;
-    Unbinder unbinder;
+
 
     @Override
     public int getLayoutId() {
@@ -47,15 +46,16 @@ public class SettingChangFragment extends BaseFragment implements MainContract.V
     @Override
     public void init() {
         mPresenter = new MainPresenter(this);
-        beforeUserName = userName.getText().toString();
-        beforeCarNum = carNum.getText().toString();
-
         UserDao userDao = App.getDaoSession().getUserDao();
         user = userDao.loadAll().get(0);
         userName.setText(user.getUsername());
         if (null != user) {
             uId = user.getUid();
         }
+        carNum.setText(null == user.getPlateNums() ? "当前未绑定车牌号" : user.getPlateNums());
+
+        beforeUserName = userName.getText().toString();
+        beforeCarNum = carNum.getText().toString();
     }
 
 
@@ -64,6 +64,11 @@ public class SettingChangFragment extends BaseFragment implements MainContract.V
         boolean hasChanged = false;
         String changeUserName = userName.getText().toString();
         String changeCarNum = carNum.getText().toString();
+        if ("".equals(changeUserName) || "".equals(changeCarNum)) {
+            Toast.makeText(getContext(), "输入不能为空", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if (!changeUserName.equals(beforeUserName)) {
             hasChanged = true;
             beforeUserName = changeUserName;
@@ -93,17 +98,20 @@ public class SettingChangFragment extends BaseFragment implements MainContract.V
 
     @Override
     public void changeSuccess() {
-        RxBus.getDefault().post(new ChangeFragment(userName.getText().toString(), carNum.getText().toString()));
+        String newName = userName.getText().toString();
+        String newcarNum = carNum.getText().toString();
+
+        RxBus.getDefault().post(new ChangeFragment(newName, newcarNum));
     }
 
     @Override
     public void getGargetSuccess(int parkId) {
-        
+
     }
 
     @Override
     public void addUserParkPositionSuccess(int parkId) {
-        
+
     }
 
 }
