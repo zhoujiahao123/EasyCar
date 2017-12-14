@@ -49,7 +49,7 @@
         <service android:name="com.amap.api.location.APSService"></service>
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="a380adbbd70f1d62eed43c3197770dfe"/>
+            android:value="24891447330048d947f8a5bec381c9fa"/>
         <!-- 通过AndroidManifest配置AppKey和AppSecret，如果你选择通过代码配置，则不需要配置以下meta-data -->
         <meta-data
             android:name="Mob-AppKey"

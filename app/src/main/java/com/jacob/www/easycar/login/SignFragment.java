@@ -80,7 +80,8 @@ public class SignFragment extends BaseFragment implements LogInContract.View {
                     showMsg("您的输入不合法");
                     return;
                 }
-                SMSSDK.submitVerificationCode(SMSSDK.getCountry("42")[1], phoneNum, verifyCodeInput.getText().toString());
+                presenter.signIn(phoneNum, passwordInput.getText().toString());
+//              SMSSDK.submitVerificationCode(SMSSDK.getCountry("42")[1], phoneNum, verifyCodeInput.getText().toString());
                 break;
             case R.id.already_have:
                 RxBus.getDefault().post(new Integer(0));
