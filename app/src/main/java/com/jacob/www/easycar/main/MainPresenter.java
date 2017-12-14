@@ -6,6 +6,7 @@ import com.jacob.www.easycar.base.App;
 import com.jacob.www.easycar.data.GarageBean;
 import com.jacob.www.easycar.data.GarageLotBean;
 import com.jacob.www.easycar.data.UserBean;
+import com.jacob.www.easycar.data.UserParkVO;
 import com.jacob.www.easycar.net.LoadingCallBack;
 import com.zxr.medicalaid.User;
 import com.zxr.medicalaid.UserDao;
@@ -82,6 +83,60 @@ public class MainPresenter implements MainContract.Presenter {
                 user.setUId(data.getUid());
                 user.setUserName(data.getUsername());
                 userDao.update(user);
+            }
+
+            @Override
+            public void error(String msg) {
+                view.hideProgress();
+                view.showMsg(msg);
+            }
+        });
+    }
+
+    @Override
+    public void getGargetResult(String uId) {
+        view.showProgress();
+        model.getGarget(uId, new LoadingCallBack<UserParkVO>() {
+            @Override
+            public void loaded(UserParkVO data) {
+                view.hideProgress();
+                view.getGargetSuccess(data.getUserPark().getParkId());
+            }
+
+            @Override
+            public void error(String msg) {
+                view.showMsg(msg);
+                view.hideProgress();
+            }
+        });
+    }
+
+    @Override
+    public void addUserPosition(String uId, String garageId, String parkId) {
+        view.showProgress();
+        model.addUserParkPosition(uId, garageId, parkId, new LoadingCallBack<UserParkVO>() {
+            @Override
+            public void loaded(UserParkVO data) {
+                view.hideProgress();
+                view.addUserParkPositionSuccess(data.getUserPark().getParkId());
+            }
+
+            @Override
+            public void error(String msg) {
+                view.showMsg(msg);
+                view.hideProgress();
+            }
+        });
+    }
+
+    @Override
+    public void deletePark(String uId) {
+        view.showProgress();
+        model.deletePark(uId, new LoadingCallBack() {
+            @Override
+            public void loaded(Object data) {
+                view.hideProgress();
+                view.showMsg("已经取消停靠,祝您一路顺风");
             }
 
             @Override

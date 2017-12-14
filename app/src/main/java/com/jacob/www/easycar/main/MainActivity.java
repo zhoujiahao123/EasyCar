@@ -227,6 +227,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             Glide.with(this).load(ResponseCons.BASE_URL + user.getIcon()).into(personImage);
         }
 
+     
     }
 
     private void changFragment(Fragment fromFragment, Fragment toFragment) {
@@ -896,6 +897,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         Log.e(TAG, gId + "是gid");
     }
 
+ 
     //展示车位
 
     @Override
@@ -967,6 +969,16 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     @Override
     public void changeSuccess() {
 
+    }
+
+    @Override
+    public void getGargetSuccess(int parkId) {
+      
+    }
+
+    @Override
+    public void addUserParkPositionSuccess(int parkId) {
+        
     }
 
 }

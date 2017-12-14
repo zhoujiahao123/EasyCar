@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.facebook.stetho.Stetho;
 import com.uuzuche.lib_zxing.activity.ZXingLibrary;
 import com.zxr.medicalaid.DaoMaster;
 import com.zxr.medicalaid.DaoSession;
@@ -18,6 +19,7 @@ public class App extends Application{
     public void onCreate() {
         super.onCreate();
         context = this;
+        Stetho.initializeWithDefaults(this);
         ZXingLibrary.initDisplayOpinion(this);
     }
     static DaoSession daoSession;

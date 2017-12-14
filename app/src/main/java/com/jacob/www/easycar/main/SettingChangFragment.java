@@ -97,5 +97,15 @@ public class SettingChangFragment extends BaseFragment implements MainContract.V
         RxBus.getDefault().post(new ChangeFragment(userName.getText().toString(), carNum.getText().toString()));
     }
 
+    @Override
+    public void getGargetSuccess(int parkId) {
+        
+    }
+
+    @Override
+    public void addUserParkPositionSuccess(int parkId) {
+        
+    }
+
 }
 

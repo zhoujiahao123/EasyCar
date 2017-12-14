@@ -4,7 +4,9 @@ import com.jacob.www.easycar.data.Data;
 import com.jacob.www.easycar.data.GarageBean;
 import com.jacob.www.easycar.data.GarageLotBean;
 import com.jacob.www.easycar.data.UserBean;
+import com.jacob.www.easycar.data.UserParkVO;
 
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -38,4 +40,15 @@ public interface Api {
     @FormUrlEncoded
     @PUT("user/{uid}")
     Observable<Data<UserBean>> changUserInfo(@Path("uid") String uId,@Field("type") String type,@Field("value") String value);
+    
+    @FormUrlEncoded
+    @PUT("park/{uid}")
+    Observable<Data<UserParkVO>> addUserCarkPosition(@Path("uid") String uId, @Field("garageId") String garageId, @Field("parkId") String parkId);
+    
+    @GET("park/{uid}")
+    Observable<Data<UserParkVO>> getGargetResult(@Path("uid") String uId);
+    
+    
+    @DELETE("park/{uid}")
+    Observable<Data<Object>> deletePark(@Path("uid") String uId);
 }
