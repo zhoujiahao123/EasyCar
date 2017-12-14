@@ -110,9 +110,11 @@ public class SettingChangFragment extends BaseFragment implements MainContract.V
     }
 
     @Override
-    public void addUserParkPositionSuccess(int parkId) {
-
+    public void addUserParkPositionSuccess(int parkId, String gId) {
+        
     }
+
+
 
 }
 

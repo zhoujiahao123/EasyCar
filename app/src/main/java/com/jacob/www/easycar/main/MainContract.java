@@ -19,7 +19,7 @@ public interface MainContract {
         
         void getGargetSuccess(int parkId);
         
-        void addUserParkPositionSuccess(int parkId);
+        void addUserParkPositionSuccess(int parkId,String gId);
         
         
     }

@@ -36,7 +36,7 @@
                 style="@style/SettingStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="张兴锐"/>
+              />
         </LinearLayout>
 
         <include
@@ -61,7 +61,7 @@
                 style="@style/SettingStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="15086943358"/>
+               />
         </LinearLayout>
 
         <include
@@ -86,7 +86,7 @@
                 style="@style/SettingStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="渝C:XXXXX"/>
+             />
         </LinearLayout>
 
         <include
@@ -113,7 +113,7 @@
                 style="@style/SettingStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="渝C:XXXXX"/>
+            />
         </LinearLayout>
 
         <include

@@ -170,16 +170,20 @@ public class SettingFragment extends BaseFragment implements MainContract.View {
     }
 
     @Override
-    public void addUserParkPositionSuccess(int pId) {
+    public void addUserParkPositionSuccess(int pId, String gId) {
         Toast.makeText(getContext(), "成功停靠", Toast.LENGTH_SHORT).show();
         SpUtil.putString(getContext(), PARK_ID, pId + "");
+        SpUtil.putString(getContext(), "gId", gId);
         parkIdTv.setText(pId + "号");
     }
+
 
     @Override
     public void showMsg(String msg) {
         if ("已经取消停靠,祝您一路顺风".equals(msg)) {
             SpUtil.putString(getContext(), PARK_ID, "");
+            SpUtil.putString(getContext(), "gId", "");
+            ((MainActivity) getActivity()).setGarageId("");
             parkIdTv.setText("当前未停车");
         }
         super.showMsg(msg);

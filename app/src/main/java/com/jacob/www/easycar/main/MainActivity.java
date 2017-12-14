@@ -76,6 +76,7 @@ import com.jacob.www.easycar.overlay.DrivingRouteOverlay;
 import com.jacob.www.easycar.util.DisplayUtil;
 import com.jacob.www.easycar.util.ProgressDialogUtils;
 import com.jacob.www.easycar.util.RxBus;
+import com.jacob.www.easycar.util.SpUtil;
 import com.jacob.www.easycar.widget.CircleImageView;
 import com.jacob.www.easycar.widget.GarageImage;
 import com.uuzuche.lib_zxing.activity.CaptureActivity;
@@ -160,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         presenter = new MainPresenter(this);
-
+        gId = SpUtil.getString(this,"gId","");
         initView(savedInstanceState);
         initRxBus();
     }
@@ -844,6 +845,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 break;
             case R.id.garage_info:
                 //得到二进制序列
+                Log.i(TAG,gId);
                 presenter.getGarageLot(gId);
                 break;
             case R.id.capture:
@@ -871,7 +873,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                     String result = bundle.getString(CodeUtils.RESULT_STRING);
                     RxBus.getDefault().post(result);
                 } else if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED) {
-                    Toast.makeText(this, "不支持该格式", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "扫描结果有误", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -887,14 +889,13 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
 
-    private String gId;
+    private String gId ;
 
     /**
      * 用来设置当前的车库的id
      */
     public void setGarageId(String gId) {
         this.gId = gId;
-        Log.e(TAG, gId + "是gid");
     }
 
  
@@ -977,8 +978,10 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
     @Override
-    public void addUserParkPositionSuccess(int parkId) {
+    public void addUserParkPositionSuccess(int parkId, String gId) {
         
     }
+
+
 
 }

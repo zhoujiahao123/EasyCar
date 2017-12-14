@@ -1,7 +1,5 @@
 package com.jacob.www.easycar.main;
 
-import android.util.Log;
-
 import com.jacob.www.easycar.base.App;
 import com.jacob.www.easycar.data.GarageBean;
 import com.jacob.www.easycar.data.GarageLotBean;
@@ -19,7 +17,7 @@ import com.jacob.www.easycar.net.LoadingCallBack;
 public class MainPresenter implements MainContract.Presenter {
     Model model = new MainModelImpl();
     MainContract.View view;
-    UserDao userDao = App.getDaoSession().getUserDao();
+
 
     public MainPresenter(MainContract.View view) {
         this.view = view;
@@ -30,7 +28,6 @@ public class MainPresenter implements MainContract.Presenter {
         model.getData(longitude, latitude, distance, new LoadingCallBack() {
             @Override
             public void loaded(Object data) {
-                Log.e("getNearGarage", "搜索车库成功");
                 if (data instanceof GarageBean) {
                     view.showGarage((GarageBean) data);
                 }
@@ -38,7 +35,6 @@ public class MainPresenter implements MainContract.Presenter {
 
             @Override
             public void error(String msg) {
-                Log.e("getNearGarage", "失败了");
                 view.showMsg(msg);
             }
         });
@@ -124,7 +120,7 @@ public class MainPresenter implements MainContract.Presenter {
             @Override
             public void loaded(UserParkVO data) {
                 view.hideProgress();
-                view.addUserParkPositionSuccess(data.getUserPark().getParkId());
+                view.addUserParkPositionSuccess(data.getUserPark().getParkId(),data.getUserPark().getGarageId());
             }
 
             @Override
