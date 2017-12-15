@@ -3,6 +3,7 @@ package com.jacob.www.easycar.main;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -68,6 +69,7 @@ import com.jacob.www.easycar.R;
 import com.jacob.www.easycar.base.App;
 import com.jacob.www.easycar.data.ChangeFragment;
 import com.jacob.www.easycar.data.GarageBean;
+import com.jacob.www.easycar.data.PayInfo;
 import com.jacob.www.easycar.data.SearchSuggestionItem;
 import com.jacob.www.easycar.net.ResponseCons;
 import com.jacob.www.easycar.overlay.DrivingRouteOverlay;
@@ -87,6 +89,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.pedant.SweetAlert.SweetAlertDialog;
+import rx.Subscription;
 import rx.functions.Action1;
 
 /**
@@ -104,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
      * 0:settingFragment
      * 1:settingChangFragment
      */
-
+    SharedPreferences spf;
     private int flag = 0;
     Fragment settingFragment = new SettingFragment();
     Fragment settingChangeFragment = new SettingChangFragment();
@@ -160,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         presenter = new MainPresenter(this);
-
+        spf=getSharedPreferences("judge",MODE_PRIVATE);
         initView(savedInstanceState);
         initRxBus();
     }
@@ -173,9 +177,27 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                         MainActivity.this.changFragment(settingChangeFragment, settingFragment);
                     }
                 });
+        subscription =RxBus.getDefault().toObservable(PayInfo.class)
+                .subscribe(new Action1<PayInfo>() {
+                    @Override
+                    public void call(PayInfo s) {
+                        Log.e("TAG","call");
+                        showPayInfo(s.getPayinfo());
+                    }
+                });
     }
 
-
+    /**
+     * 展示扣费信息
+     * @param
+     */
+    private void showPayInfo(String info){
+        Log.e("TAG","showPayInfo");
+        new SweetAlertDialog(this, SweetAlertDialog.SUCCESS_TYPE)
+                .setTitleText("扣款成功")
+                .setContentText("根据您停车时间扣款"+info)
+                .show();
+    }
     private void initView(Bundle savedInstanceState) {
         mSearchView.setOnQueryChangeListener(this);
         mSearchView.setOnSearchListener(this);
@@ -292,11 +314,19 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         super.onResume();
         mAMapNaviView.onResume();
         mMapView.onResume();
+        SharedPreferences.Editor editor=spf.edit();
+        boolean needShowInfo =spf.getBoolean("needShowInfo",false);
+        if(needShowInfo){
+            showPayInfo(spf.getString("money","51元"));
+        }
+        editor.clear();
+        editor.putBoolean("destroy",false);
+        editor.commit();
     }
 
     @Override
     protected void onPause() {
-        Log.e("TAG", "onResume");
+        Log.e("TAG", "onPause");
         super.onPause();
         mAMapNaviView.onPause();
         mMapView.onPause();
@@ -304,7 +334,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     protected void onDestroy() {
-        Log.e("TAG", "onResume");
+        Log.e("TAG", "onDestroy");
         super.onDestroy();
         mAMapNaviView.onDestroy();
         if (mAMapNavi != null) {
@@ -312,6 +342,10 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             mAMapNavi.destroy();
         }
         mMapView.onDestroy();
+        SharedPreferences.Editor editor=spf.edit();
+        editor.putBoolean("destroy",true);
+        editor.commit();
+//        subscription.unsubscribe();
     }
 
     @Override
@@ -395,10 +429,16 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     private NaviInfo naviInfo;
 
+    boolean lotIsShow=false,lotClose=false;//第二个是当用户关闭自动弹出的lot后就不再自动弹出了
     @Override
     public void onNaviInfoUpdate(NaviInfo naviInfo) {
         this.naviInfo = naviInfo;
         Log.e(TAG, naviInfo.getPathRetainDistance() + "      " + naviInfo.getPathRetainTime());
+        if(naviInfo.getPathRetainDistance()<100&&!lotIsShow&&!lotClose){
+            presenter.getGarageLot(gId);
+            lotIsShow=true;
+            lotClose=true;
+        }
     }
 
     @Override
@@ -443,7 +483,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         if (horizontalInfiniteCycleViewPager != null && horizontalInfiniteCycleViewPager.getVisibility() == View.VISIBLE) {
             horizontalInfiniteCycleViewPager.setVisibility(View.INVISIBLE);
         }
-        mAMapNavi.startNavi(NaviType.GPS);
+        mAMapNavi.startNavi(NaviType.EMULATOR);
         isNavi = true;
     }
 
@@ -464,6 +504,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             aMap.setMyLocationStyle(myLocationStyle);
             aMap.moveCamera(CameraUpdateFactory.zoomTo(nowZoom));
             mMapView.setVisibility(View.VISIBLE);
+            lotClose=false;
         } else if (horizontalInfiniteCycleViewPager != null) {
             horizontalInfiniteCycleViewPager.setVisibility(View.INVISIBLE);
             horizontalInfiniteCycleViewPager = null;
@@ -471,6 +512,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATE);
             aMap.setMyLocationStyle(myLocationStyle);
             aMap.moveCamera(CameraUpdateFactory.zoomTo(nowZoom));
+            lotClose=false;
         } else if (isNavi) {
             isNavi = false;
             mAMapNavi.stopNavi();
@@ -480,6 +522,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             aMap.setMyLocationStyle(myLocationStyle);
             aMap.moveCamera(CameraUpdateFactory.zoomTo(nowZoom));
             mMapView.setVisibility(View.VISIBLE);
+            lotClose=false;
         } else {
             super.onBackPressed();
         }
@@ -955,6 +998,12 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                                 }).show();
                     }
                 })
+                .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialogInterface) {
+                        lotIsShow=false;
+                    }
+                })
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -968,5 +1017,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     public void changeSuccess() {
 
     }
+    Subscription subscription;
 
 }

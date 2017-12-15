@@ -3,10 +3,13 @@ package com.jacob.www.easycar.base;
 import android.app.Application;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.uuzuche.lib_zxing.activity.ZXingLibrary;
 import com.zxr.medicalaid.DaoMaster;
 import com.zxr.medicalaid.DaoSession;
+
+import cn.jpush.android.api.JPushInterface;
 
 /**
  * Created by ASUS-NB on 2017/11/18.
@@ -18,6 +21,9 @@ public class App extends Application{
     public void onCreate() {
         super.onCreate();
         context = this;
+        Log.e("TAG","app初始化");
+        JPushInterface.setDebugMode(true);
+        JPushInterface.init(this);
         ZXingLibrary.initDisplayOpinion(this);
     }
     static DaoSession daoSession;

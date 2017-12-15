@@ -6,6 +6,7 @@ import com.jacob.www.easycar.R;
 import com.jacob.www.easycar.base.App;
 import com.jacob.www.easycar.data.UserBean;
 import com.jacob.www.easycar.net.LoadingCallBack;
+import com.jacob.www.easycar.util.TagAliasOperateHelper;
 import com.zxr.medicalaid.DaoSession;
 import com.zxr.medicalaid.User;
 import com.zxr.medicalaid.UserDao;
@@ -34,6 +35,17 @@ public class LogInPresenter implements LogInContract.Presenter {
             public void loaded(UserBean userBean) {
                 Log.e("TAG", "loaded");
                 view.hideProgress();
+                //这里将id作为别名设置
+                int action = -1;
+                boolean isAliasAction = true;
+                TagAliasOperateHelper.TagAliasBean tagAliasBean  = new TagAliasOperateHelper.TagAliasBean();
+                TagAliasOperateHelper.sequence++;
+                action = TagAliasOperateHelper.ACTION_SET;
+                tagAliasBean.action = action;
+                tagAliasBean.alias= userBean.getUid();
+                Log.e("TAG", tagAliasBean.alias);
+                tagAliasBean.isAliasAction = isAliasAction;
+                TagAliasOperateHelper.getInstance().handleAction(App.getAppContext(),TagAliasOperateHelper.sequence,tagAliasBean);
                 user.setIcon(userBean.getIcon());
                 user.setUId(userBean.getUid());
                 user.setPhoneNum(userBean.getPhone());

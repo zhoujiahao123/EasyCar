@@ -22,6 +22,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
     }
     buildTypes {
         release {
@@ -79,5 +80,6 @@ dependencies {
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:2.4.0'
     //二维码
     compile 'cn.yipianfengye.android:zxing-library:2.2'
-
+    compile files('libs/jpush-android-3.1.0.jar')
+    compile 'cn.pedant.sweetalert:library:1.3'
 }
