@@ -16,6 +16,12 @@ public interface MainContract {
         void showLot(String lot);
         
         void changeSuccess();
+        
+        void getGargetSuccess(int parkId);
+        
+        void addUserParkPositionSuccess(int parkId,String gId);
+        
+        
     }
 
     interface Presenter extends BasePresenter {
@@ -29,6 +35,13 @@ public interface MainContract {
         void getGarageLot(String gId);
 
         void changeInfo(String uId, String type, String value);
+        
+        
+        void getGargetResult(String uId);
+        
+        void addUserPosition(String uId,String garageId,String parkId);
+
+        void deletePark(String uId);
         
     }
 }

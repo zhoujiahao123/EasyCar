@@ -71,17 +71,18 @@ import com.jacob.www.easycar.data.ChangeFragment;
 import com.jacob.www.easycar.data.GarageBean;
 import com.jacob.www.easycar.data.PayInfo;
 import com.jacob.www.easycar.data.SearchSuggestionItem;
+import com.jacob.www.easycar.data.User;
+import com.jacob.www.easycar.greendao.UserDao;
 import com.jacob.www.easycar.net.ResponseCons;
 import com.jacob.www.easycar.overlay.DrivingRouteOverlay;
 import com.jacob.www.easycar.util.DisplayUtil;
 import com.jacob.www.easycar.util.ProgressDialogUtils;
 import com.jacob.www.easycar.util.RxBus;
+import com.jacob.www.easycar.util.SpUtil;
 import com.jacob.www.easycar.widget.CircleImageView;
 import com.jacob.www.easycar.widget.GarageImage;
 import com.uuzuche.lib_zxing.activity.CaptureActivity;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
-import com.zxr.medicalaid.User;
-import com.zxr.medicalaid.UserDao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -165,6 +166,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         ButterKnife.bind(this);
         presenter = new MainPresenter(this);
         spf=getSharedPreferences("judge",MODE_PRIVATE);
+        gId = SpUtil.getString(this,"gId","");
         initView(savedInstanceState);
         initRxBus();
     }
@@ -249,6 +251,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             Glide.with(this).load(ResponseCons.BASE_URL + user.getIcon()).into(personImage);
         }
 
+     
     }
 
     private void changFragment(Fragment fromFragment, Fragment toFragment) {
@@ -886,6 +889,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 break;
             case R.id.garage_info:
                 //得到二进制序列
+                Log.i(TAG,gId);
                 presenter.getGarageLot(gId);
                 break;
             case R.id.capture:
@@ -913,7 +917,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                     String result = bundle.getString(CodeUtils.RESULT_STRING);
                     RxBus.getDefault().post(result);
                 } else if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED) {
-                    Toast.makeText(this, "不支持该格式", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "扫描结果有误", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -929,16 +933,16 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
 
-    private String gId;
+    private String gId ;
 
     /**
      * 用来设置当前的车库的id
      */
     public void setGarageId(String gId) {
         this.gId = gId;
-        Log.e(TAG, gId + "是gid");
     }
 
+ 
     //展示车位
 
     @Override
@@ -1018,5 +1022,17 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     }
     Subscription subscription;
+
+    @Override
+    public void getGargetSuccess(int parkId) {
+      
+    }
+
+    @Override
+    public void addUserParkPositionSuccess(int parkId, String gId) {
+        
+    }
+
+
 
 }

@@ -5,9 +5,10 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.facebook.stetho.Stetho;
+import com.jacob.www.easycar.greendao.DaoMaster;
+import com.jacob.www.easycar.greendao.DaoSession;
 import com.uuzuche.lib_zxing.activity.ZXingLibrary;
-import com.zxr.medicalaid.DaoMaster;
-import com.zxr.medicalaid.DaoSession;
 
 import cn.jpush.android.api.JPushInterface;
 
@@ -21,9 +22,13 @@ public class App extends Application{
     public void onCreate() {
         super.onCreate();
         context = this;
+
         Log.e("TAG","app初始化");
         JPushInterface.setDebugMode(true);
         JPushInterface.init(this);
+
+        Stetho.initializeWithDefaults(this);
+
         ZXingLibrary.initDisplayOpinion(this);
     }
     static DaoSession daoSession;

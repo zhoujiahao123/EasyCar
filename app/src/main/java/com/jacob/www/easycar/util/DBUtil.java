@@ -3,8 +3,9 @@ package com.jacob.www.easycar.util;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.zxr.medicalaid.DaoMaster;
-import com.zxr.medicalaid.DaoSession;
+import com.jacob.www.easycar.greendao.DaoMaster;
+import com.jacob.www.easycar.greendao.DaoSession;
+
 
 /**
  * Created by ASUS-NB on 2017/11/18.

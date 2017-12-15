@@ -34,11 +34,10 @@
             <EditText
                 android:id="@+id/userName"
                 style="@style/SettingStyle"
-
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@null"
-                android:text="张兴锐"/>
+                />
         </LinearLayout>
 
         <include
@@ -65,7 +64,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@null"
-                android:text="渝C:XXXXX"/>
+                />
         </LinearLayout>
 
         <include

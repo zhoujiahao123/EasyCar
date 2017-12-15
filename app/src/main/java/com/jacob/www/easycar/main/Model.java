@@ -12,4 +12,10 @@ public interface Model  {
     void getLot(String gId,LoadingCallBack callBack);
     
     void changeInfo(String uId,String type,String value,LoadingCallBack callBack);
+    
+    void getGarget(String uId,LoadingCallBack callBack);
+    
+    void addUserParkPosition(String uId,String garageId,String parkId,LoadingCallBack callBack);
+    
+    void deletePark(String uId,LoadingCallBack callBack);
 }

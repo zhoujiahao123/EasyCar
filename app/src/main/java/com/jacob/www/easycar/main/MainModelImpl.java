@@ -71,6 +71,21 @@ public class MainModelImpl extends BaseModelImpl implements Model {
 
     @Override
     public void changeInfo(String uId, String type, String value, LoadingCallBack callBack) {
-        httpRequest(api.changUserInfo(uId,type,value),callBack);
+        httpRequest(api.changUserInfo(uId, type, value), callBack);
+    }
+
+    @Override
+    public void getGarget(String uId, LoadingCallBack callBack) {
+        httpRequest(api.getGargetResult(uId), callBack);
+    }
+
+    @Override
+    public void addUserParkPosition(String uId, String garageId, String parkId, LoadingCallBack callBack) {
+        httpRequest(api.addUserCarkPosition(uId, garageId, parkId),callBack);
+    }
+
+    @Override
+    public void deletePark(String uId, LoadingCallBack callBack) {
+        httpRequest(api.deletePark(uId),callBack);
     }
 }
