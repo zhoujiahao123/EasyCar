@@ -31,9 +31,7 @@ android {
             debuggable true
             signingConfig signingConfigs.ZJHconfig
         }
-        debug {
-            signingConfig signingConfigs.ZJHconfig
-        }
+       
     }
     sourceSets {
         main {
