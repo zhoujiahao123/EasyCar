@@ -175,6 +175,7 @@ public class SettingFragment extends BaseFragment implements MainContract.View {
         SpUtil.putString(getContext(), PARK_ID, pId + "");
         SpUtil.putString(getContext(), "gId", gId);
         parkIdTv.setText(pId + "号");
+        ((MainActivity) getActivity()).setGarageId(gId);
     }
 
 
