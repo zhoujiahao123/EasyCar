@@ -1,18 +1,160 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.jacob.www.easycar.main.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <RelativeLayout
 
-</android.support.constraint.ConstraintLayout>
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#ffffff">
+
+        <com.amap.api.navi.AMapNaviView
+            android:id="@+id/navi_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
+
+        <com.amap.api.maps.MapView
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <com.arlib.floatingsearchview.FloatingSearchView
+            android:id="@+id/floating_search_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            app:floatingSearch_close_search_on_keyboard_dismiss="true"
+            app:floatingSearch_leftActionMode="showSearch"
+            app:floatingSearch_searchBarMarginLeft="@dimen/margin_normal"
+            app:floatingSearch_searchBarMarginRight="@dimen/margin_normal"
+            app:floatingSearch_searchBarMarginTop="@dimen/margin_small"
+            app:floatingSearch_searchHint="Where you want to go?"
+            app:floatingSearch_showSearchKey="false"
+            app:floatingSearch_suggestionsListAnimDuration="300">
+
+        </com.arlib.floatingsearchview.FloatingSearchView>
+
+
+        <com.gigamole.infinitecycleviewpager.HorizontalInfiniteCycleViewPager
+            android:id="@+id/hicvp"
+            android:layout_width="350dp"
+            android:layout_height="250dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp"
+            app:icvp_center_page_scale_offset="30dp"
+            app:icvp_interpolator="@android:anim/accelerate_decelerate_interpolator"
+            app:icvp_max_page_scale="0.8"
+            app:icvp_medium_scaled="false"
+            app:icvp_min_page_scale="0.55"
+            app:icvp_min_page_scale_offset="5dp"
+            app:icvp_scroll_duration="250"/>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/margin_normal"
+            android:layout_marginTop="68dp"
+            app:cardCornerRadius="8dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/person_age"
+                    android:layout_width="@dimen/right_button_size"
+                    android:layout_height="@dimen/right_button_size"
+                    android:padding="@dimen/margin_small"
+                    android:src="@drawable/person_age"/>
+
+                <include
+                    layout="@layout/view_normal_divider"
+                    ></include>
+
+                <ImageView
+                    android:id="@+id/neighbor_garage"
+                    android:layout_width="@dimen/right_button_size"
+                    android:layout_height="@dimen/right_button_size"
+                    android:padding="@dimen/margin_small"
+                    android:src="@drawable/nebehoir_car"/>
+
+                <include
+                    layout="@layout/view_normal_divider"
+                    ></include>
+
+                <ImageView
+                    android:id="@+id/garage_info"
+                    android:layout_width="@dimen/right_button_size"
+                    android:layout_height="@dimen/right_button_size"
+                    android:padding="@dimen/margin_small"
+                    android:src="@drawable/target_garage"/>
+                <include
+                    layout="@layout/view_normal_divider"
+                    ></include>
+
+                <ImageView
+                    android:id="@+id/capture"
+                    android:layout_width="@dimen/right_button_size"
+                    android:layout_height="@dimen/right_button_size"
+                    android:padding="@dimen/margin_small"
+                    android:src="@drawable/qr_code"/>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="@dimen/margin_small"
+            android:layout_marginLeft="@dimen/margin_normal"
+            app:cardCornerRadius="8dp">
+
+            <ImageView
+                android:id="@+id/location"
+                android:layout_width="@dimen/right_button_size"
+                android:layout_height="@dimen/right_button_size"
+                android:padding="@dimen/margin_small"
+                android:src="@drawable/location"/>
+        </android.support.v7.widget.CardView>
+    </RelativeLayout>
+
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/person_age_bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:behavior_peekHeight="0dp"
+        app:layout_behavior="@string/bottom_sheet_behavior">
+
+        <LinearLayout
+            android:id="@+id/setting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.jacob.www.easycar.widget.CircleImageView
+                android:id="@+id/person_image"
+                android:layout_width="@dimen/image_size_normal"
+                android:layout_height="@dimen/image_size_normal"
+                android:layout_gravity="center"
+                android:src="@drawable/person_image"/>
+            <FrameLayout
+                android:id="@+id/setting_frame_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                
+            </FrameLayout>
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+
+
+</android.support.design.widget.CoordinatorLayout>

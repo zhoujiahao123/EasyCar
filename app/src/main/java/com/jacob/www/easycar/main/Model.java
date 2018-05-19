@@ -1,13 +1,21 @@
 package com.jacob.www.easycar.main;
 
+import com.jacob.www.easycar.net.LoadingCallBack;
+
 /**
  * Created by ASUS-NB on 2017/11/12.
  */
 
 public interface Model  {
-    interface LoadingCallBack{
-        void onLoaded();//数据加载成功
-    }
+    void getData(double longitude,double latitude,double distance,LoadingCallBack callBack);
 
-    void getData(LoadingCallBack callBack);
+    void getLot(String gId,LoadingCallBack callBack);
+    
+    void changeInfo(String uId,String type,String value,LoadingCallBack callBack);
+    
+    void getGarget(String uId,LoadingCallBack callBack);
+    
+    void addUserParkPosition(String uId,String garageId,String parkId,LoadingCallBack callBack);
+    
+    void deletePark(String uId,LoadingCallBack callBack);
 }

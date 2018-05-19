@@ -1,58 +1,71 @@
 package com.jacob.www.easycar.login;
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputEditText;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 
 import com.jacob.www.easycar.R;
+import com.jacob.www.easycar.base.BaseActivity;
+import com.jacob.www.easycar.main.MainActivity;
+import com.jacob.www.easycar.util.RxBus;
+import com.jacob.www.easycar.util.SpUtil;
+import com.jacob.www.easycar.util.ToActivityUtil;
+import com.rd.PageIndicatorView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
+import rx.Subscription;
+import rx.functions.Action1;
 
 /**
  * Created by ASUS-NB on 2017/11/12.
  */
 
-public class LogInActivity extends AppCompatActivity implements LogInContract.View {
+public class LogInActivity extends BaseActivity {
 
 
-    @BindView(R.id.phone_num_text)
-    TextInputEditText phoneNumText;
-    @BindView(R.id.pas_num_text)
-    TextInputEditText pasNumText;
-    @BindView(R.id.btn_login)
-    Button btnLogin;
-    LogInContract.Presenter presenter;
+    @BindView(R.id.view_pager)
+    ViewPager viewPager;
+    @BindView(R.id.indicator)
+    PageIndicatorView indicator;
+    Subscription subscription;
+
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-        ButterKnife.bind(this);
-        presenter = new LogInPresenter(this);
+    public int getLayoutId() {
+        return R.layout.activity_login;
     }
 
     @Override
-    public void setPresenter(LogInContract.Presenter presenter) {
+    public void init() {
+        if(SpUtil.getBoolean(this,"has_login",false)){
+            ToActivityUtil.toNextActivityAndFinish(this, MainActivity.class);
+        }
+        //加入Fragment
+        Fragment loginFragment = new LoginFragment();
+        Fragment signFragment = new SignFragment();
+        List<Fragment> fragments = new ArrayList<>();
+        fragments.add(loginFragment);
+        fragments.add(signFragment);
+        LoginViewPagerAdapter adapter = new LoginViewPagerAdapter(getSupportFragmentManager(), fragments);
+        viewPager.setAdapter(adapter);
 
+        indicator.setViewPager(viewPager);
+
+        subscription = RxBus.getDefault().toObservable(Integer.class)
+                .subscribe(new Action1<Integer>() {
+                    @Override
+                    public void call(Integer i) {
+                        viewPager.setCurrentItem(i);
+                    }
+                });
     }
 
     @Override
-    public void logInSucceed() {
-        Log.e("TAG","保存成功");
-    }
-
-    @Override
-    public void logInFailed() {
-        Log.e("TAG","保存失败");
-    }
-
-    @OnClick(R.id.btn_login)
-    public void onClick() {
-        presenter.start(phoneNumText.getText().toString(),pasNumText.getText().toString());
+    protected void onDestroy() {
+        super.onDestroy();
+        if (subscription != null && !subscription.isUnsubscribed()) {
+            subscription = null;
+        }
     }
 }

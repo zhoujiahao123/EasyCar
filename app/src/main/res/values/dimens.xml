@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_normal">16dp</dimen>
+    <dimen name="margin_large">32dp</dimen>
+
+
+    <!--font size-->
+    <dimen name="font_huge">25sp</dimen>
+    <dimen name="font_large">18sp</dimen>
+    <dimen name="font_normal">15sp</dimen>
+    <dimen name="font_small">12sp</dimen>
+
+    <dimen name="image_size_tiny">20dp</dimen>
+    <dimen name="image_size_small">48dp</dimen>
+    <dimen name="image_size_normal">60dp</dimen>
+
+    <dimen name="list_item_height">72dp</dimen>
+
+    <dimen name="button_height">48dp</dimen>
+    <dimen name="right_button_size">36dp</dimen>
+</resources>

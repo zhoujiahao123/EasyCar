@@ -8,12 +8,13 @@ import com.jacob.www.easycar.base.BaseView;
  */
 
 public class LogInContract {
-    interface View extends BaseView<Presenter>{
-        void logInSucceed();
-        void logInFailed();
+    interface View extends BaseView {
+        void success();
     }
 
-    interface Presenter extends BasePresenter{
-        void logIn(String phoneNum,String pas);
+    interface Presenter extends BasePresenter {
+        void logIn(String phoneNum, String pas);
+
+        void signIn(String phoneNum, String pas);
     }
 }
