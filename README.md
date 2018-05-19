@@ -27,15 +27,13 @@
 
 ## 2. 功能展示
 
-### 主界面&病人队列&开药中心
+### 登陆&注册
 
-​    <img src="https://github.com/zzbb1199/Medical-aid/blob/master/pic/%E4%B8%BB%E7%95%8C%E9%9D%A2.jpg" title="主界面" width="250px" alt="主界面">  <img src="https://github.com/zzbb1199/Medical-aid/blob/master/pic/%E7%97%85%E4%BA%BA%E9%98%9F%E5%88%97.jpg" title="病人队列"  width="250px" alt="病人队列"><img src="https://github.com/zzbb1199/Medical-aid/blob/master/pic/%E5%BC%80%E8%8D%AF%E4%B8%AD%E5%BF%83.jpg" title="开药中心"  width="250px" alt="开药中心">
+<img src="https://github.com/zhoujiahao123/EasyCar/blob/master/pic/%E7%99%BB%E9%99%86.jpg" title="登陆" width="250px" ><img src="https://github.com/zhoujiahao123/EasyCar/blob/master/pic/%E6%B3%A8%E5%86%8C.jpg" title="注册" width="250px" >
 
-### 个人中心&药材百科&药材保质
+### 
 
-​    <img src="https://github.com/zzbb1199/Medical-aid/blob/master/pic/%E4%B8%AA%E4%BA%BA%E4%B8%AD%E5%BF%83.jpg" title="个人中心"  width="250px" alt="个人中心">  <img src="https://github.com/zzbb1199/Medical-aid/blob/master/pic/%E8%8D%AF%E6%9D%90%E7%99%BE%E7%A7%91.jpg" title="药材百科"  width="250px" alt="药材百科">  <img src="https://github.com/zzbb1199/Medical-aid/blob/master/pic/%E8%8D%AF%E6%9D%90%E4%BF%9D%E8%B4%A8%E6%9F%A5%E8%AF%A2.jpg" title="药材保质"  width="250px" alt="药材保质">
-
-
+<img src="https://github.com/zhoujiahao123/EasyCar/blob/master/pic/%E9%99%84%E8%BF%91%E8%BD%A6%E8%BE%86.jpg" title="附近车库" width="250px" ><img src="https://github.com/zhoujiahao123/EasyCar/blob/master/pic/%E7%9B%AE%E6%A0%87%E8%BD%A6%E5%BA%93%E5%8D%A0%E7%94%A8%E6%83%85%E5%86%B5.jpg" title="目标车库占用情况" width="250px" ><img src="https://github.com/zhoujiahao123/EasyCar/blob/master/pic/%E7%9B%AE%E6%A0%87%E8%BD%A6%E5%BA%93%E5%B9%B3%E9%9D%A2%E5%88%86%E5%B8%83.jpg" title="目标车库平面图" width="250px" >
 
 ## 3 开发环境及技术支持
 
@@ -49,7 +47,7 @@
 #### 3.1.2 运行环境
 
 - Android平台系列手机
-- minSDK>=18
+- minSDK>=15
 
 ### 3.2 技术支持
 
@@ -60,7 +58,10 @@
    - Retrofit2+RxJava：简化网络请求API与主子线程调度
 3. 本地数据存储
    - SharedPreference：Android 自带简单本地存储API。
-   - GreenDao：轻量高效数据库。
 4. 代码解耦
-   - MVP设计模式：业务分为3个层次，M-Model，V-View，P-presnter，通过p进行中转达到解耦。
+   - MVP设计模式：业务分为3个层次，M-Model，V-View，P-presnter
    - Dagger2：依赖注入框架，减少模块之间的依赖
+
+## 4. 最后
+
+**本项目未曾上线，附近车辆采用模拟硬件完成，所有结果仅供参考。**
